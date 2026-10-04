@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lab 08 - Web3 Front-end Interaction</title>
+  <!-- Nhúng thư viện Ethers.js v5 từ CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 30px;
+      line-height: 1.6;
+    }
+
+    .card {
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 8px;
+      max-width: 500px;
+      background: #fafafa;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+
+    input {
+      padding: 8px;
+      width: 80%;
+      margin-top: 10px;
+    }
+
+    .status {
+      font-weight: bold;
+      color: #28a745;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="card">
+    <h2>Web3 DApp Demo - Lab 08</h2>
+
+    <!-- 1. Kết nối ví -->
+    <div>
+      <button id="btnConnect" onclick="connectWallet()">1. Kết nối ví MetaMask</button>
+      <p id="walletAddress">Ví: Chưa kết nối</p>
+      <p id="networkName" style="color: #666; font-size: 0.9em;"></p>
+    </div>
+    <hr>
+
+    <!-- 2. Đọc trạng thái -->
+    <div>
+      <h3>Đọc trạng thái (Read)</h3>
+      <button onclick="readStatus()">2. Đọc systemStatus</button>
+      <p class="status" id="displayStatus">Trạng thái hiện tại: --</p>
+    </div>
+    <hr>
+
+    <!-- 3. Cập nhật trạng thái -->
+    <div>
+      <h3>Ghi trạng thái (Write - Chỉ Owner)</h3>
+      <input type="text" id="newStatusInput" placeholder="Nhập trạng thái mới...">
+      <br>
+      <button onclick="updateStatus()">3. Cập nhật trạng thái</button>
+    </div>
+  </div>
+
+  <script>
+    // Sử dụng ethers.utils.getAddress để tự động chuẩn hóa Checksum địa chỉ hợp đồng
+    const rawAddress = "0xC61d78A92B7Dfdf85fAB1c22135977721dd96F4c";
+    const contractAddress = ethers.utils.getAddress(rawAddress.toLowerCase());
+
+    // Khai báo ABI của AccessControl
+    const contractABI = [
+      "function systemStatus() public view returns (string)",
+      "function setSystemStatus(string memory _newStatus) public",
+      "function owner() public view returns (address)"
+    ];
+
+    let provider;
+    let signer;
+    let contract;
+
+    // Hàm kết nối MetaMask
+    async function connectWallet() {
+      if (typeof window.ethereum !== 'undefined') {
+        try {
+          await window.ethereum.request({ method: 'eth_requestAccounts' });
+          provider = new ethers.providers.Web3Provider(window.ethereum);
+
+          // Kiểm tra mạng MetaMask
+          const network = await provider.getNetwork();
+          document.getElementById('networkName').innerText = "Mạng hiện tại: " + network.name + " (Chain ID: " + network.chainId + ")";
+
+          if (network.chainId !== 11155111) { // 11155111 là Chain ID của Sepolia
+            alert("CẢNH BÁO: Ví của bạn chưa chọn mạng Sepolia! Vui lòng chuyển sang mạng Sepolia Testnet trên MetaMask.");
+          }
+
+          signer = provider.getSigner();
+          const address = await signer.getAddress();
+
+          document.getElementById('walletAddress').innerText = "Ví: " + address;
+          document.getElementById('btnConnect').innerText = "Đã kết nối";
+
+          // Khởi tạo Smart Contract
+          contract = new ethers.Contract(contractAddress, contractABI, signer);
+        } catch (err) {
+          alert("Lỗi kết nối ví: " + err.message);
+        }
+      } else {
+        alert("Vui lòng cài đặt tiện ích MetaMask!");
+      }
+    }
+
+    // Hàm đọc dữ liệu (Free - không mất gas)
+    async function readStatus() {
+      if (!contract) return alert("Vui lòng kết nối ví trước!");
+      try {
+        const currentStatus = await contract.systemStatus();
+        document.getElementById('displayStatus').innerText = "Trạng thái hiện tại: " + currentStatus;
+      } catch (err) {
+        console.error(err);
+        alert("Lỗi đọc dữ liệu: CALL_EXCEPTION.\nHãy kiểm tra lại:\n1. Mạng trên MetaMask đã chọn đúng Sepolia chưa?\n2. Địa chỉ contract có đúng là hợp đồng AccessControl ở Lab 07 không?");
+      }
+    }
+
+    // Hàm ghi dữ liệu (Gửi giao dịch - Tốn gas)
+    async function updateStatus() {
+      if (!contract) return alert("Vui lòng kết nối ví trước!");
+      const newVal = document.getElementById('newStatusInput').value;
+      if (!newVal) return alert("Vui lòng nhập giá trị!");
+
+      try {
+        const tx = await contract.setSystemStatus(newVal);
+        alert("Giao dịch đã gửi! Mã TxHash: " + tx.hash + "\nĐang chờ xác nhận...");
+        await tx.wait(); // Chờ giao dịch hoàn tất
+        alert("Cập nhật thành công!");
+        readStatus(); // Đọc lại dữ liệu mới
+      } catch (err) {
+        alert("Giao dịch thất bại: " + err.message);
+      }
+    }
+  </script>
+</body>
+
+</html>
