@@ -12,7 +12,7 @@
 | STT | Họ và tên | GitHub Username | Vai trò trong dự án | Trạng thái quyền |
 | :--- | :--- | :--- | :--- | :--- |
 | 1 | Phan Thị Huyền Trang | `huyentrang005` | Trưởng nhóm / Quản trị Repo / Smart Contract | Owner (Chủ sở hữu) |
-| 2 | [Tên thành viên 2] | [username_thành_viên_2] | Thành viên / Front-end DApp & Kiểm thử | Collaborator (Cộng tác viên) |
+| 2 | Trần Thị Thi Thơ | `thot23547-cpu` | Thành viên / Front-end DApp & Kiểm thử | Collaborator (Cộng tác viên) |
 
 ## 3. Cấu trúc Tài nguyên Đã triển khai trên Repo
 
