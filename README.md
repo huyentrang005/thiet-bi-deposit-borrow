@@ -24,9 +24,8 @@ Nhóm phát triển một ứng dụng phi tập trung (Web3 DApp) kết hợp h
 
 | Họ và tên | Mã sinh viên | GitHub Username | Vai trò chính Lab 8–11 | Vai trò chính Lab 12–15 |
 | :--- | :--- | :--- | :--- | :--- |
-| **Phan Thị Huyền Trang** (Trưởng nhóm) | [Điền MSSV] | `@huyentrang005` | Hợp đồng thông minh & Đặc tả | Kiểm thử ca tấn công & Báo cáo |
-| **[Họ tên Thành viên 2]** | [Điền MSSV] | `@[username_thanh_vien_2]` | Giao diện Web3 DApp | Hợp đồng & Audit bảo mật |
-| **[Họ tên Thành viên 3 (nếu có)]** | [Điền MSSV] | `@[username_thanh_vien_3]` | Kịch bản kiểm thử & Tài liệu | Giao diện hoàn thiện & Triển khai |
+| **Phan Thị Huyền Trang** (Trưởng nhóm) | `huyentrang005` | `@huyentrang005` | Hợp đồng thông minh & Đặc tả | Kiểm thử ca tấn công & Báo cáo |
+| **Trần Thị Thi Thơ** (Thành viên) | `thot23547-cpu` | `@thot23547-cpu` | Giao diện Web3 DApp | Hợp đồng & Audit bảo mật |
 
 ---
 

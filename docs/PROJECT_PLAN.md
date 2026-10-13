@@ -10,9 +10,8 @@
 
 | Họ và tên | Mã sinh viên | Vai chính Lab 8–11 | Vai chính Lab 12–15 |
 | :--- | :--- | :--- | :--- |
-| **Phan Thị Huyền Trang** (Trưởng nhóm) | [Điền MSSV] | Hợp đồng thông minh & Đặc tả | Kiểm thử ca tấn công & Báo cáo |
-| **[Họ tên Thành viên 2]** | [Điền MSSV] | Giao diện Web3 DApp | Hợp đồng & Audit bảo mật |
-| **[Họ tên Thành viên 3 (nếu có)]** | [Điền MSSV] | Kịch bản kiểm thử & Tài liệu | Giao diện hoàn thiện & Triển khai |
+| **Phan Thị Huyền Trang** (Trưởng nhóm) | `huyentrang005` | Hợp đồng thông minh & Đặc tả | Kiểm thử ca tấn công & Báo cáo |
+| **Trần Thị Thi Thơ** (Thành viên) | `thot23547-cpu` | Giao diện Web3 DApp & Tài liệu | Hợp đồng & Audit bảo mật |
 
 *Ghi chú:* Bốn vai gồm Đặc tả, Hợp đồng, Giao diện, Kiểm thử. Nhóm xoay vai theo đúng quy định trước Lab 15.
 
