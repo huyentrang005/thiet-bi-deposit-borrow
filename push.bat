@@ -5,7 +5,7 @@ echo   DANG DAY CODE LEN GITHUB CHO NHOM (ECO2432)
 echo ========================================================
 echo.
 
-set "PATH=C:\Users\HTPC\AppData\Local\Programs\Git\cmd;C:\Users\HTPC\AppData\Local\Programs\Git\ucrt64\bin;%PATH%"
+set "PATH=%LOCALAPPDATA%\Programs\Git\cmd;C:\Program Files\Git\cmd;C:\Users\HTPC\AppData\Local\Programs\Git\cmd;C:\Users\LAPTOP\AppData\Local\Programs\Git\cmd;%PATH%"
 
 git.exe push -u origin main
 
