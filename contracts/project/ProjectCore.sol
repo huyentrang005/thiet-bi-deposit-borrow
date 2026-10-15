@@ -2,7 +2,7 @@
 pragma solidity ^0.8.20;
 
 /// @title Dat coc muon thiet bi CLB - Tinh tien phat theo so ngay tre (Chu de 2 - ECO2432)
-/// @notice Ke thua mau M.1 (SimpleEscrow), do dai duoi 150 dong theo quy dinh Bo loc pham vi
+/// @notice Da duoc audit va va loi o Lab 10, do dai duoi 150 dong theo quy dinh Bo loc pham vi
 contract ProjectCore {
     enum State { Created, Borrowed, Completed }
 
@@ -17,6 +17,7 @@ contract ProjectCore {
     // Cac su kien ghi nhan thay doi trang thai tren blockchain
     event Borrowed(address indexed borrower, uint256 deposit, uint256 dueTime);
     event Returned(address indexed borrower, uint256 refundAmount, uint256 penaltyAmount);
+    event DeviceReset();
 
     // Cac custom error tiet kiem gas
     error NotOwner();
@@ -24,6 +25,7 @@ contract ProjectCore {
     error WrongState();
     error WrongDepositAmount();
     error TransferFailed();
+    error InvalidParameters();
 
     modifier onlyOwner() {
         if (msg.sender != owner) revert NotOwner();
@@ -40,7 +42,9 @@ contract ProjectCore {
         uint256 _borrowDurationDays,
         uint256 _penaltyPerDay
     ) {
-        require(_depositAmount > 0, "Tien coc phai lon hon 0");
+        if (_depositAmount == 0 || _borrowDurationDays == 0 || _penaltyPerDay > _depositAmount) {
+            revert InvalidParameters();
+        }
         owner = msg.sender;
         depositAmount = _depositAmount;
         borrowDuration = _borrowDurationDays * 1 days;
@@ -95,6 +99,14 @@ contract ProjectCore {
 
         // Tien phat khong duoc vuot qua tong tien coc da dong
         return totalPenalty > depositAmount ? depositAmount : totalPenalty;
+    }
+
+    /// @notice Dat lai trang thai de cho sinh vien tiep theo muon (Sua loi o Lab 10)
+    function resetDevice() external onlyOwner inState(State.Completed) {
+        state = State.Created;
+        borrower = address(0);
+        dueTime = 0;
+        emit DeviceReset();
     }
 
     /// @notice Kiem tra thoi gian con lai truoc khi het han
