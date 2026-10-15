@@ -7,7 +7,7 @@ echo.
 
 set "PATH=%LOCALAPPDATA%\Programs\Git\cmd;C:\Program Files\Git\cmd;C:\Users\HTPC\AppData\Local\Programs\Git\cmd;C:\Users\LAPTOP\AppData\Local\Programs\Git\cmd;%PATH%"
 
-git.exe push -u origin main
+git.exe push -u origin main --tags
 
 if %ERRORLEVEL% equ 0 (
     echo.

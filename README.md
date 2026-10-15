@@ -45,18 +45,28 @@ Trang web DApp đã được cấu hình sẵn sàng triển khai trên **Vercel
 ```bash
 thiet-bi-deposit-borrow/
 ├── contracts/
-│   └── QuanLyThietBi.sol     # Smart Contract quản lý ký quỹ & mượn trả thiết bị
+│   ├── project/
+│   │   └── ProjectCore.sol       # Hợp đồng thông minh lõi (Chủ đề 2: Ký quỹ & phạt trễ hạn)
+│   ├── training/                 # Bài mẫu học kỹ thuật (TimeLockVault, VaultBuggy, VulnerableBank)
+│   └── QuanLyThietBi.sol         # Hợp đồng quản lý thiết bị ban đầu
+├── test/
+│   └── ProjectCoreTest.sol       # Ca kiểm thử quy tắc kinh tế & chặn gian lận
 ├── web/
-│   └── index.html             # Giao diện Web3 DApp (HTML/CSS/JS + Ethers.js v5)
+│   └── index.html                # Giao diện Web3 DApp (HTML/CSS/JS + Ethers.js v5)
 ├── docs/
-│   ├── SPEC.md                # Đặc tả kỹ thuật và phân tích nghiệp vụ
-│   ├── ECONOMIC_RULES.md      # Quy tắc kinh tế và cơ chế phạt/thưởng
-│   └── PROJECT_PLAN.md        # Kế hoạch phát triển dự án nhóm
-├── vercel.json                # Cấu hình tự động triển khai tĩnh trên Vercel
-├── lab08.md                   # Báo cáo thiết lập repository nhóm & phân quyền
-├── push.bat                   # Kịch bản tự động đẩy code lên GitHub
-├── pull.bat                   # Kịch bản đồng bộ code mới nhất từ GitHub
-└── README.md                  # Tài liệu giới thiệu dự án
+│   ├── SPEC.md                   # Đặc tả kỹ thuật và phân tích nghiệp vụ
+│   ├── ECONOMIC_RULES.md         # Quy tắc kinh tế và cơ chế phạt/thưởng
+│   ├── PROJECT_PLAN.md           # Kế hoạch phát triển dự án nhóm
+│   ├── AI_JOURNAL.md             # Nhật ký làm việc với AI từ Lab 8 đến Lab 15
+│   ├── GATE_REVIEW_1.md          # Biên bản Gate Review 1 (Duyệt phạm vi Lab 12)
+│   ├── AUDIT_REPORT.md           # Báo cáo rà soát chéo hợp đồng (Lab 14)
+│   └── PRESENTATION_PLAN.md      # Kịch bản thuyết trình và demo 5 phút (Lab 15)
+├── evidence/                     # Minh chứng ảnh và log cho từng Lab (Lab 8 - Lab 15)
+│   ├── lab-08/ ... lab-15/
+├── vercel.json                   # Cấu hình tự động triển khai tĩnh trên Vercel
+├── push.bat                      # Kịch bản tự động đẩy code & tags lên GitHub
+├── pull.bat                      # Kịch bản đồng bộ code mới nhất từ GitHub
+└── README.md                     # Tài liệu giới thiệu dự án
 ```
 
 ---

@@ -325,19 +325,25 @@
   </div>
 
   <script>
-    // ABI chuẩn của hợp đồng QuanLyThietBi.sol
+    // ABI chuẩn của hợp đồng ProjectCore.sol và QuanLyThietBi.sol
     const contractABI = [
+      "function tongThietBi() public view returns (uint256)",
       "function tongSoThietBi() public view returns (uint256)",
+      "function danhSachThietBi(uint256) public view returns (uint256 id, string memory ten, uint256 tienCoc, uint256 thoiHanMuon, uint256 phiPhatMoiNgay, uint8 trangThai, address nguoiMuon, uint256 thoiDiemMuon, uint256 hanChotTra)",
       "function layThongTinThietBi(uint256 _id) public view returns (uint256 id, string memory tenThietBi, uint256 tienCoc, uint8 trangThai, address nguoiMuon, uint256 thoiDiemMuon)",
+      "function themThietBi(string calldata _ten, uint256 _tienCoc, uint256 _thoiHanMuon, uint256 _phiPhatMoiNgay) external",
       "function themThietBi(string calldata _tenThietBi, uint256 _tienCoc) external",
       "function capNhatBaoTri(uint256 _id, bool _laBaoTri) external",
       "function muonThietBi(uint256 _id) external payable",
       "function traVaHoanCoc(uint256 _id, uint256 _khauTruBps) external",
+      "function tinhTienPhat(uint256 _id, uint256 _thoiDiemTra) public view returns (uint256)",
       "function owner() public view returns (address)",
+      "event ThietBiDaThem(uint256 indexed id, string ten, uint256 tienCoc, uint256 phiPhatMoiNgay)",
       "event ThietBiDaThem(uint256 indexed id, string tenThietBi, uint256 tienCoc)",
+      "event ThietBiDuocMuon(uint256 indexed id, address indexed nguoiMuon, uint256 hanChotTra)",
       "event ThietBiDuocMuon(uint256 indexed id, address indexed nguoiMuon, uint256 tienCoc)",
-      "event ThietBiDaTra(uint256 indexed id, address indexed nguoiMuon)",
-      "event TienCocDaHoan(uint256 indexed id, address indexed nguoiMuon, uint256 soTienHoan, uint256 soTienKhauTru)"
+      "event ThietBiDaTra(uint256 indexed id, address indexed nguoiMuon, uint256 tienHoan, uint256 tienPhat)",
+      "event ThietBiDaTra(uint256 indexed id, address indexed nguoiMuon)"
     ];
 
     let provider;
@@ -394,8 +400,15 @@
       contract = new ethers.Contract(address, contractABI, signer);
 
       try {
-        contractOwner = await contract.owner();
-        const total = await contract.tongSoThietBi();
+        try { contractOwner = await contract.owner(); } catch (e) {}
+
+        let total;
+        try {
+          total = await contract.tongThietBi();
+        } catch (e) {
+          total = await contract.tongSoThietBi();
+        }
+
         const tbody = document.getElementById("deviceTableBody");
         tbody.innerHTML = "";
 
@@ -405,17 +418,35 @@
         }
 
         for (let i = 1; i <= total.toNumber(); i++) {
-          const tb = await contract.layThongTinThietBi(i);
-          const tr = document.createElement("tr");
+          let tb;
+          let tenThietBi = "";
+          let tienCocWei;
+          let trangThaiNum = 0;
+          let nguoiMuonAddr = ethers.constants.AddressZero;
 
+          try {
+            tb = await contract.danhSachThietBi(i);
+            tenThietBi = tb.ten || tb[1];
+            tienCocWei = tb.tienCoc || tb[2];
+            trangThaiNum = tb.trangThai !== undefined ? tb.trangThai : tb[5];
+            nguoiMuonAddr = tb.nguoiMuon || tb[6];
+          } catch (e) {
+            tb = await contract.layThongTinThietBi(i);
+            tenThietBi = tb.tenThietBi || tb[1];
+            tienCocWei = tb.tienCoc || tb[2];
+            trangThaiNum = tb.trangThai !== undefined ? tb.trangThai : tb[3];
+            nguoiMuonAddr = tb.nguoiMuon || tb[4];
+          }
+
+          const tr = document.createElement("tr");
           let statusBadge = "";
           let actionBtn = "";
-          const depositEth = ethers.utils.formatEther(tb.tienCoc);
+          const depositEth = ethers.utils.formatEther(tienCocWei);
 
-          if (tb.trangThai === 0) {
+          if (trangThaiNum === 0) {
             statusBadge = `<span class="badge badge-ready">Sẵn sàng</span>`;
-            actionBtn = `<button class="btn btn-success" style="padding: 6px 12px; font-size: 0.8rem;" onclick="borrowDevice(${tb.id}, '${depositEth}')">Mượn (${depositEth} ETH)</button>`;
-          } else if (tb.trangThai === 1) {
+            actionBtn = `<button class="btn btn-success" style="padding: 6px 12px; font-size: 0.8rem;" onclick="borrowDevice(${i}, '${depositEth}')">Mượn (${depositEth} ETH)</button>`;
+          } else if (trangThaiNum === 1) {
             statusBadge = `<span class="badge badge-borrowed">Đang mượn</span>`;
             actionBtn = `<span style="font-size: 0.8rem; color: var(--text-muted);">Đang sử dụng</span>`;
           } else {
@@ -423,11 +454,11 @@
             actionBtn = `<span style="font-size: 0.8rem; color: var(--danger);">Tạm dừng</span>`;
           }
 
-          const borrowerShort = tb.nguoiMuon === ethers.constants.AddressZero ? "--" : `${tb.nguoiMuon.substring(0, 6)}...${tb.nguoiMuon.substring(38)}`;
+          const borrowerShort = nguoiMuonAddr === ethers.constants.AddressZero ? "--" : `${nguoiMuonAddr.substring(0, 6)}...${nguoiMuonAddr.substring(38)}`;
 
           tr.innerHTML = `
-            <td><strong>#${tb.id}</strong></td>
-            <td>${tb.tenThietBi}</td>
+            <td><strong>#${i}</strong></td>
+            <td>${tenThietBi}</td>
             <td><strong>${depositEth} ETH</strong></td>
             <td>${statusBadge}</td>
             <td><span style="font-family: monospace;">${borrowerShort}</span></td>
