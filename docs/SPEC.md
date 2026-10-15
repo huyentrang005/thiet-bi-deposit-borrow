@@ -1,117 +1,63 @@
-# SPEC — ĐẶT CỌC MƯỢN THIẾT BỊ
+# SPEC — Quản Lý Đặt Cọc Mượn Trả Thiết Bị (SmartRent v0.1)
 
 ## 1. Mục đích
 
-Hệ thống hỗ trợ sinh viên đặt cọc để mượn thiết bị và tự động
-xử lý việc hoàn cọc hoặc khấu trừ tiền khi trả thiết bị trễ hạn.
+Hệ thống quản lý và tự động hóa quy trình đặt cọc, mượn và hoàn trả thiết bị bằng Smart Contract minh bạch trên Blockchain Sepolia, giúp phòng thực hành/lab trường học và sinh viên tránh thất thoát tài sản, loại bỏ gian lận và giải quyết tranh chấp tiền cọc tự động.
+
+---
 
 ## 2. Đầu vào
 
-- Người mượn: địa chỉ ví của sinh viên.
-- Thiết bị: mã hoặc tên thiết bị được mượn.
-- Tiền đặt cọc: số tiền ETH người mượn phải gửi.
-- Thời hạn trả: thời điểm người mượn phải trả thiết bị.
-- Mức phạt: số ETH bị trừ cho mỗi ngày trả trễ.
-- Thời điểm trả thực tế: thời điểm người mượn trả thiết bị.
+- `themThietBi(string calldata _tenThietBi, uint256 _tienCoc)`: Quản trị viên (Owner) cung cấp tên thiết bị và số tiền cọc yêu cầu (đơn vị: wei).
+- `capNhatBaoTri(uint256 _id, bool _laBaoTri)`: Quản trị viên cung cấp ID thiết bị và trạng thái chuyển sang bảo trì hoặc sẵn sàng.
+- `muonThietBi(uint256 _id)` / `borrow()`: Người mượn cung cấp ID thiết bị và gửi kèm giá trị `msg.value` (ETH) đúng bằng tiền cọc quy định.
+- `traVaHoanCoc(uint256 _id, uint256 _khauTruBps)` / `returnDevice()`: Quản trị viên nghiệm thu và hoàn cọc (tự động tính tiền phạt trễ hạn theo ngày và trừ vào tiền cọc).
 
-## 3. Quy tắc nghiệp vụ
+---
 
-### R1 — Đặt cọc
+## 3. Quy tắc nghiệp vụ có thể kiểm thử (Tối thiểu 4 quy tắc)
 
-Người mượn phải gửi đúng số tiền đặt cọc được yêu cầu.
+- **Quy tắc 1 (Ai được làm gì):** 
+  - Chỉ có tài khoản Quản trị viên (`owner`) mới có quyền thêm mới thiết bị vào kho và chuyển đổi trạng thái bảo trì của thiết bị.
+  - *Kiểm thử:* Ví không phải Owner gọi các hàm quản trị phải bị từ chối với lỗi `NotOwner`.
 
-Nếu số tiền gửi khác số tiền đặt cọc thì giao dịch phải bị từ chối.
+- **Quy tắc 2 (Khi nào được mượn):** 
+  - Người mượn chỉ được phép mượn khi thiết bị đang ở trạng thái sẵn sàng (`State.Created` hoặc `TrangThai.SanSang`) và gửi kèm chính xác số tiền cọc quy định (`msg.value == depositAmount`).
+  - *Kiểm thử:* Mượn thiết bị đang có người mượn hoặc gửi thiếu tiền cọc phải báo lỗi `WrongState` hoặc `WrongDepositAmount`.
 
-### R2 — Khóa tiền đặt cọc
+- **Quy tắc 3 (Giới hạn bao nhiêu):** 
+  - Toàn bộ tiền cọc ETH được ký quỹ an toàn trực tiếp trên hợp đồng trong suốt quá trình mượn.
+  - Tiền phạt trễ hạn được tính theo công thức: $\text{Tiền phạt} = \text{Số ngày trễ} \times \text{Mức phạt mỗi ngày}$.
+  - Tỷ lệ khấu trừ khi hoàn cọc tối đa không được vượt quá 100% tiền cọc.
+  - *Kiểm thử:* Trễ hạn nhiều ngày thì tiền phạt tối đa chỉ bằng 100% tiền cọc, không bị âm số dư.
 
-Sau khi đặt cọc thành công, Smart Contract phải giữ tiền
-đặt cọc cho đến khi giao dịch được xử lý hoàn tất.
+- **Quy tắc 4 (Lỗi thì sao & Xử lý hoàn tiền):** 
+  - Mọi hàm thay đổi trạng thái nếu không thỏa mãn điều kiện đều bị revert ngay lập tức và hoàn trả nguyên vẹn lượng gas chưa sử dụng bằng các custom error.
+  - Khi hoàn cọc, trạng thái thiết bị và người mượn phải được cập nhật trước (Effects), sau đó mới thực hiện chuyển ETH hoàn cọc qua lệnh `call` (Interactions). Nếu chuyển tiền thất bại, toàn bộ giao dịch phải revert.
 
-Người mượn không được tự ý rút tiền đặt cọc trong thời gian
-mượn thiết bị.
-
-### R3 — Trả đúng hạn
-
-Nếu người mượn trả thiết bị trước hoặc đúng thời hạn thì:
-
-- Không phát sinh tiền phạt.
-- Người mượn được hoàn lại toàn bộ tiền đặt cọc.
-- Giao dịch chuyển sang trạng thái hoàn tất.
-
-### R4 — Trả trễ hạn
-
-Nếu người mượn trả thiết bị sau thời hạn thì:
-
-- Xác định số ngày trễ.
-- Tính tiền phạt theo số ngày trễ.
-- Khấu trừ tiền phạt từ tiền đặt cọc.
-- Hoàn lại phần tiền đặt cọc còn lại cho người mượn.
-
-### R5 — Giới hạn tiền phạt
-
-Tiền phạt không được lớn hơn tiền đặt cọc.
-
-Nếu tiền phạt tính được lớn hơn tiền đặt cọc thì tiền phạt
-thực tế chỉ bằng tiền đặt cọc.
-
-### R6 — Không hoàn cọc hai lần
-
-Một giao dịch đã hoàn tất không được phép thực hiện thao tác
-hoàn tiền lần thứ hai.
-
-### R7 — Kiểm soát quyền
-
-Chỉ tài khoản có quyền quản lý mới được tạo hoặc thay đổi
-các thông tin quản lý của giao dịch.
-
-Người mượn chỉ được thực hiện các thao tác thuộc quyền của mình.
+---
 
 ## 4. Đầu ra
 
-Hệ thống phải hiển thị:
+- Phát sự kiện on-chain minh bạch cho mọi giao dịch thay đổi trạng thái:
+  - `Borrowed(address indexed borrower, uint256 deposit, uint256 dueTime)`
+  - `Returned(address indexed borrower, uint256 refundAmount, uint256 penaltyAmount)`
+  - `DeviceReset()`
+- Hàm tra cứu công khai `timeLeft()` và `calculatePenalty()` trả về thời gian mượn còn lại và số tiền phạt thực tế.
 
-- Trạng thái giao dịch mượn thiết bị.
-- Số tiền đặt cọc.
-- Thời hạn trả.
-- Số ngày trả trễ nếu có.
-- Tiền phạt nếu có.
-- Số tiền được hoàn lại cho người mượn.
-
-Sau khi giao dịch hoàn tất, Smart Contract phải xử lý tiền
-đặt cọc theo đúng quy tắc đã xác định.
+---
 
 ## 5. Trường hợp ngoại lệ
 
-### E1 — Gửi sai tiền đặt cọc
+- **E1:** Người dùng gửi thừa hoặc thiếu tiền cọc khi mượn ➔ Revert `WrongDepositAmount()`.
+- **E2:** Người dùng gọi thao tác mượn trên thiết bị đang có người mượn ➔ Revert `WrongState()`.
+- **E3:** Người không có quyền gọi hoàn cọc ➔ Revert `NotOwner()`.
+- **E4:** Địa chỉ ví người mượn là hợp đồng từ chối nhận ETH khi hoàn tiền ➔ Revert `TransferFailed()`.
 
-Nếu người mượn gửi số tiền khác với số tiền đặt cọc yêu cầu,
-Smart Contract phải từ chối giao dịch.
-
-### E2 — Trả thiết bị trễ
-
-Nếu thời điểm trả thực tế sau thời hạn trả, hệ thống phải tính
-tiền phạt dựa trên số ngày trễ.
-
-### E3 — Tiền phạt lớn hơn tiền đặt cọc
-
-Nếu tiền phạt tính được lớn hơn tiền đặt cọc, hệ thống chỉ được
-khấu trừ tối đa bằng số tiền đặt cọc.
-
-### E4 — Hoàn tiền lần thứ hai
-
-Nếu giao dịch đã hoàn tất mà có yêu cầu hoàn tiền lần nữa,
-Smart Contract phải từ chối thao tác.
-
-### E5 — Người không có quyền
-
-Nếu tài khoản không có quyền quản lý cố gắng thay đổi thông tin
-quản lý, thao tác phải bị từ chối.
+---
 
 ## 6. Ngoài phạm vi
 
-- Không quản lý thông tin cá nhân của sinh viên.
-- Không quản lý tình trạng vật lý của thiết bị.
-- Không xử lý việc sửa chữa hoặc bồi thường hư hỏng thiết bị.
-- Không tích hợp hệ thống quản lý kho thiết bị thực tế.
-- Không sử dụng tiền Việt Nam; các khoản tiền trong Smart Contract
-  được tính bằng ETH.
+- Hệ thống không định vị GPS vị trí vật lý ngoại đời của thiết bị.
+- Hệ thống không tự động thẩm định mức độ hư hại phần cứng (phải do Thủ kho kiểm tra thực tế rồi nhập tỷ lệ khấu trừ).
+- Chưa hỗ trợ đặt cọc bằng ERC20 token đa dạng (chỉ sử dụng Native ETH trên Sepolia).
