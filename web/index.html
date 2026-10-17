@@ -248,7 +248,7 @@
       <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border);">
         <label style="font-size: 0.85rem; color: var(--text-muted);">Địa chỉ Hợp đồng QuanLyThietBi trên Sepolia:</label>
         <div style="display: flex; gap: 8px; margin-top: 6px;">
-          <input type="text" id="contractAddressInput" value="0xC61d78A92B7DfdF85fAB1c22135977721dd96F4c" placeholder="0x... (Dán địa chỉ sau khi deploy Remix)">
+          <input type="text" id="contractAddressInput" value="0xC61d78A92B7Dfdf85fAB1c22135977721dd96F4c" placeholder="0x... (Dán địa chỉ sau khi deploy Remix)">
           <button class="btn btn-warning" onclick="loadContractData()" style="white-space: nowrap;">Tải dữ liệu</button>
         </div>
       </div>
@@ -346,6 +346,9 @@
       "event ThietBiDaTra(uint256 indexed id, address indexed nguoiMuon)"
     ];
 
+    // Thay dia chi hop dong QuanLyThietBi.sol cua nhom da deploy tren Sepolia
+    const contractAddress = "0xC61d78A92B7Dfdf85fAB1c22135977721dd96F4c";
+
     let provider;
     let signer;
     let contract;
@@ -388,7 +391,8 @@
     }
 
     async function loadContractData() {
-      const address = document.getElementById("contractAddressInput").value.trim();
+      const inputVal = document.getElementById("contractAddressInput").value.trim();
+      const address = inputVal || contractAddress;
       if (!address || !ethers.utils.isAddress(address)) {
         return alert("Vui lòng nhập địa chỉ Contract hợp lệ trên Sepolia!");
       }
