@@ -235,6 +235,16 @@
       <p>Hệ thống Ký quỹ (Escrow) phi tập trung trên mạng Ethereum Sepolia Testnet</p>
     </header>
 
+    <!-- Thẻ hướng dẫn nhanh -->
+    <div class="card" style="background: rgba(30, 41, 59, 0.6); border-left: 4px solid var(--primary); padding: 14px 18px;">
+      <div style="font-size: 0.88rem; line-height: 1.6;">
+        <span style="font-weight: 600; color: #a5b4fc;">💡 Hướng dẫn sử dụng cho Sinh viên & Nhóm:</span><br>
+        1. <strong>Mượn thiết bị:</strong> Chọn thiết bị ở trạng thái <span class="badge badge-ready" style="padding: 2px 8px;">Sẵn sàng</span> trong bảng bên dưới 👉 Bấm nút <span style="background: var(--success); color: #fff; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">Mượn</span> để đặt cọc ETH.<br>
+        2. <strong>BQL Nghiệm thu & Hoàn cọc:</strong> Sử dụng bảng điều khiển Admin bên dưới để hoàn trả cọc tự động (có thể khấu trừ phí trễ hạn).<br>
+        3. <strong>Môi trường:</strong> Hệ thống tự động kích hoạt <em>Chế độ Demo Tương tác</em> (hoạt động ngay) hoặc kết nối <em>Sepolia Testnet</em> khi kết nối ví MetaMask.
+      </div>
+    </div>
+
     <!-- Thẻ kết nối ví & Hợp đồng -->
     <div class="card">
       <div class="wallet-bar">
@@ -258,7 +268,10 @@
     <div class="card">
       <div class="card-title">
         <span>📦 Danh Mục Thiết Bị Trong Kho</span>
-        <button class="btn" style="margin-left: auto; padding: 6px 12px; font-size: 0.8rem;" onclick="loadContractData()">🔄 Làm mới</button>
+        <div style="margin-left: auto; display: flex; gap: 8px; align-items: center;">
+          <span id="modeBadge" class="badge" style="background: rgba(99, 102, 241, 0.2); color: #a5b4fc;">Chế độ: Đang tải...</span>
+          <button class="btn" style="padding: 6px 12px; font-size: 0.8rem;" onclick="loadContractData()">🔄 Làm mới</button>
+        </div>
       </div>
       <div style="overflow-x: auto;">
         <table>
@@ -325,25 +338,21 @@
   </div>
 
   <script>
-    // ABI chuẩn của hợp đồng ProjectCore.sol và QuanLyThietBi.sol
+    // ABI chuan cua hop dong ProjectCore.sol va QuanLyThietBi.sol
     const contractABI = [
-      "function tongThietBi() public view returns (uint256)",
       "function tongSoThietBi() public view returns (uint256)",
-      "function danhSachThietBi(uint256) public view returns (uint256 id, string memory ten, uint256 tienCoc, uint256 thoiHanMuon, uint256 phiPhatMoiNgay, uint8 trangThai, address nguoiMuon, uint256 thoiDiemMuon, uint256 hanChotTra)",
+      "function tongThietBi() public view returns (uint256)",
       "function layThongTinThietBi(uint256 _id) public view returns (uint256 id, string memory tenThietBi, uint256 tienCoc, uint8 trangThai, address nguoiMuon, uint256 thoiDiemMuon)",
-      "function themThietBi(string calldata _ten, uint256 _tienCoc, uint256 _thoiHanMuon, uint256 _phiPhatMoiNgay) external",
+      "function danhSachThietBi(uint256) public view returns (uint256 id, string memory ten, uint256 tienCoc, uint8 trangThai, address nguoiMuon, uint256 thoiDiemMuon)",
       "function themThietBi(string calldata _tenThietBi, uint256 _tienCoc) external",
       "function capNhatBaoTri(uint256 _id, bool _laBaoTri) external",
       "function muonThietBi(uint256 _id) external payable",
       "function traVaHoanCoc(uint256 _id, uint256 _khauTruBps) external",
-      "function tinhTienPhat(uint256 _id, uint256 _thoiDiemTra) public view returns (uint256)",
       "function owner() public view returns (address)",
-      "event ThietBiDaThem(uint256 indexed id, string ten, uint256 tienCoc, uint256 phiPhatMoiNgay)",
       "event ThietBiDaThem(uint256 indexed id, string tenThietBi, uint256 tienCoc)",
-      "event ThietBiDuocMuon(uint256 indexed id, address indexed nguoiMuon, uint256 hanChotTra)",
       "event ThietBiDuocMuon(uint256 indexed id, address indexed nguoiMuon, uint256 tienCoc)",
-      "event ThietBiDaTra(uint256 indexed id, address indexed nguoiMuon, uint256 tienHoan, uint256 tienPhat)",
-      "event ThietBiDaTra(uint256 indexed id, address indexed nguoiMuon)"
+      "event ThietBiDaTra(uint256 indexed id, address indexed nguoiMuon)",
+      "event TienCocDaHoan(uint256 indexed id, address indexed nguoiMuon, uint256 soTienHoan, uint256 soTienKhauTru)"
     ];
 
     // Thay dia chi hop dong QuanLyThietBi.sol cua nhom da deploy tren Sepolia
@@ -354,6 +363,16 @@
     let contract;
     let userAddress = "";
     let contractOwner = "";
+    let isDemoMode = false;
+
+    // Danh sach thiet bi mau dung cho che do trai nghiem / demo tuong tac
+    let demoDevices = [
+      { id: 1, ten: "Máy ảnh kỹ thuật số Canon EOS R50 (Kèm Lens 18-45mm)", tienCocEth: "0.05", trangThai: 0, nguoiMuon: "" },
+      { id: 2, ten: "Bộ Kit Vi Điều Khiển STM32 & Cảm Biến IoT", tienCocEth: "0.02", trangThai: 0, nguoiMuon: "" },
+      { id: 3, ten: "Máy Chiếu Di Động Full HD Epson CO-FH02", tienCocEth: "0.08", trangThai: 1, nguoiMuon: "0x71C84920E3253b76E1A8dCd12A456C6977113A9F" },
+      { id: 4, ten: "Máy Đo Tín Hiệu Xung Cầm Tay Oscilloscope DS212", tienCocEth: "0.04", trangThai: 0, nguoiMuon: "" },
+      { id: 5, ten: "Kính Thực Tế Ảo VR Meta Quest 2 128GB", tienCocEth: "0.10", trangThai: 0, nguoiMuon: "" }
+    ];
 
     function addLog(msg) {
       const logBox = document.getElementById("eventLogs");
@@ -376,13 +395,21 @@
 
         document.getElementById("networkInfo").innerText = `Mạng: ${network.name} (Chain ID: ${network.chainId})`;
         if (network.chainId !== 11155111) {
-          alert("Lưu ý: Vui lòng chuyển sang mạng Sepolia Testnet trên MetaMask để thực hiện giao dịch!");
+          try {
+            await window.ethereum.request({
+              method: 'wallet_switchEthereumChain',
+              params: [{ chainId: '0xaa36a7' }],
+            });
+          } catch (switchError) {
+            alert("Lưu ý: Vui lòng chuyển sang mạng Sepolia Testnet trên MetaMask để thực hiện giao dịch!");
+          }
         }
 
         signer = provider.getSigner();
         userAddress = await signer.getAddress();
         document.getElementById("walletAddress").innerText = `${userAddress.substring(0, 6)}...${userAddress.substring(38)}`;
-        document.getElementById("btnConnect").innerText = "Đã kết nối ví";
+        document.getElementById("btnConnect").innerText = "Đã kết nối ví (" + userAddress.substring(0, 6) + "...)";
+        addLog(`Đã kết nối ví MetaMask: ${userAddress}`);
 
         loadContractData();
       } catch (err) {
@@ -390,104 +417,160 @@
       }
     }
 
+    function renderDeviceTable(devices) {
+      const tbody = document.getElementById("deviceTableBody");
+      tbody.innerHTML = "";
+
+      if (!devices || devices.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 20px;">Kho chưa có thiết bị nào. Quản trị viên hãy thêm thiết bị mới bên dưới!</td></tr>`;
+        return;
+      }
+
+      devices.forEach(item => {
+        const tr = document.createElement("tr");
+        let statusBadge = "";
+        let actionBtn = "";
+        const depositEth = item.tienCocEth;
+
+        if (item.trangThai === 0) {
+          statusBadge = `<span class="badge badge-ready">Sẵn sàng</span>`;
+          actionBtn = `<button class="btn btn-success" style="padding: 6px 12px; font-size: 0.8rem;" onclick="borrowDevice(${item.id}, '${depositEth}')">Mượn (${depositEth} ETH)</button>`;
+        } else if (item.trangThai === 1) {
+          statusBadge = `<span class="badge badge-borrowed">Đang mượn</span>`;
+          actionBtn = `<span style="font-size: 0.8rem; color: var(--text-muted);">Đang sử dụng</span>`;
+        } else {
+          statusBadge = `<span class="badge badge-maintenance">Bảo trì</span>`;
+          actionBtn = `<span style="font-size: 0.8rem; color: var(--danger);">Tạm dừng</span>`;
+        }
+
+        const borrower = item.nguoiMuon && item.nguoiMuon !== ethers.constants.AddressZero ?
+          `${item.nguoiMuon.substring(0, 6)}...${item.nguoiMuon.substring(item.nguoiMuon.length - 4)}` : "--";
+
+        tr.innerHTML = `
+          <td><strong>#${item.id}</strong></td>
+          <td>${item.ten}</td>
+          <td><strong>${depositEth} ETH</strong></td>
+          <td>${statusBadge}</td>
+          <td><span style="font-family: monospace; color: #cbd5e1;">${borrower}</span></td>
+          <td>${actionBtn}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
     async function loadContractData() {
       const inputVal = document.getElementById("contractAddressInput").value.trim();
       const address = inputVal || contractAddress;
-      if (!address || !ethers.utils.isAddress(address)) {
-        return alert("Vui lòng nhập địa chỉ Contract hợp lệ trên Sepolia!");
-      }
+      const modeBadge = document.getElementById("modeBadge");
 
       if (!provider) {
-        provider = new ethers.providers.Web3Provider(window.ethereum || window.web3);
+        if (window.ethereum) {
+          provider = new ethers.providers.Web3Provider(window.ethereum);
+        } else {
+          provider = new ethers.providers.JsonRpcProvider("https://ethereum-sepolia-rpc.publicnode.com");
+        }
       }
-      signer = provider.getSigner();
-      contract = new ethers.Contract(address, contractABI, signer);
 
-      try {
-        try { contractOwner = await contract.owner(); } catch (e) {}
-
-        let total;
+      let loadedOnChain = false;
+      if (address && ethers.utils.isAddress(address)) {
         try {
-          total = await contract.tongThietBi();
-        } catch (e) {
-          total = await contract.tongSoThietBi();
-        }
-
-        const tbody = document.getElementById("deviceTableBody");
-        tbody.innerHTML = "";
-
-        if (total.toNumber() === 0) {
-          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Kho chưa có thiết bị nào. Quản trị viên hãy thêm thiết bị mới bên dưới!</td></tr>`;
-          return;
-        }
-
-        for (let i = 1; i <= total.toNumber(); i++) {
-          let tb;
-          let tenThietBi = "";
-          let tienCocWei;
-          let trangThaiNum = 0;
-          let nguoiMuonAddr = ethers.constants.AddressZero;
-
+          const testContract = new ethers.Contract(address, contractABI, signer || provider);
+          let total;
           try {
-            tb = await contract.danhSachThietBi(i);
-            tenThietBi = tb.ten || tb[1];
-            tienCocWei = tb.tienCoc || tb[2];
-            trangThaiNum = tb.trangThai !== undefined ? tb.trangThai : tb[5];
-            nguoiMuonAddr = tb.nguoiMuon || tb[6];
+            total = await testContract.tongSoThietBi();
           } catch (e) {
-            tb = await contract.layThongTinThietBi(i);
-            tenThietBi = tb.tenThietBi || tb[1];
-            tienCocWei = tb.tienCoc || tb[2];
-            trangThaiNum = tb.trangThai !== undefined ? tb.trangThai : tb[3];
-            nguoiMuonAddr = tb.nguoiMuon || tb[4];
+            total = await testContract.tongThietBi();
           }
 
-          const tr = document.createElement("tr");
-          let statusBadge = "";
-          let actionBtn = "";
-          const depositEth = ethers.utils.formatEther(tienCocWei);
+          if (total && total.toNumber() >= 0) {
+            contract = testContract;
+            isDemoMode = false;
+            loadedOnChain = true;
+            if (modeBadge) {
+              modeBadge.innerText = "🟢 Sepolia Testnet (On-Chain)";
+              modeBadge.style.color = "#34d399";
+              modeBadge.style.background = "rgba(16, 185, 129, 0.2)";
+            }
 
-          if (trangThaiNum === 0) {
-            statusBadge = `<span class="badge badge-ready">Sẵn sàng</span>`;
-            actionBtn = `<button class="btn btn-success" style="padding: 6px 12px; font-size: 0.8rem;" onclick="borrowDevice(${i}, '${depositEth}')">Mượn (${depositEth} ETH)</button>`;
-          } else if (trangThaiNum === 1) {
-            statusBadge = `<span class="badge badge-borrowed">Đang mượn</span>`;
-            actionBtn = `<span style="font-size: 0.8rem; color: var(--text-muted);">Đang sử dụng</span>`;
-          } else {
-            statusBadge = `<span class="badge badge-maintenance">Bảo trì</span>`;
-            actionBtn = `<span style="font-size: 0.8rem; color: var(--danger);">Tạm dừng</span>`;
+            const onChainDevices = [];
+            for (let i = 1; i <= total.toNumber(); i++) {
+              let tb;
+              try {
+                tb = await contract.layThongTinThietBi(i);
+                onChainDevices.push({
+                  id: i,
+                  ten: tb.tenThietBi || tb[1],
+                  tienCocEth: ethers.utils.formatEther(tb.tienCoc || tb[2]),
+                  trangThai: tb.trangThai !== undefined ? tb.trangThai : tb[3],
+                  nguoiMuon: tb.nguoiMuon || tb[4]
+                });
+              } catch (e) {
+                tb = await contract.danhSachThietBi(i);
+                onChainDevices.push({
+                  id: i,
+                  ten: tb.ten || tb.tenThietBi || tb[1],
+                  tienCocEth: ethers.utils.formatEther(tb.tienCoc || tb[2]),
+                  trangThai: tb.trangThai !== undefined ? tb.trangThai : tb[3],
+                  nguoiMuon: tb.nguoiMuon || tb[4]
+                });
+              }
+            }
+
+            renderDeviceTable(onChainDevices);
+            addLog(`Đã tải dữ liệu thành công từ Smart Contract Sepolia. Tổng thiết bị: ${total.toNumber()}`);
+            return;
           }
-
-          const borrowerShort = nguoiMuonAddr === ethers.constants.AddressZero ? "--" : `${nguoiMuonAddr.substring(0, 6)}...${nguoiMuonAddr.substring(38)}`;
-
-          tr.innerHTML = `
-            <td><strong>#${i}</strong></td>
-            <td>${tenThietBi}</td>
-            <td><strong>${depositEth} ETH</strong></td>
-            <td>${statusBadge}</td>
-            <td><span style="font-family: monospace;">${borrowerShort}</span></td>
-            <td>${actionBtn}</td>
-          `;
-          tbody.appendChild(tr);
+        } catch (err) {
+          console.warn("Chưa đọc được dữ liệu on-chain, chuyển sang chế độ Demo trực quan:", err);
         }
-
-        addLog(`Đã tải dữ liệu hợp đồng thành công. Tổng số thiết bị: ${total}`);
-      } catch (err) {
-        console.error(err);
-        addLog(`Lỗi tải dữ liệu: ${err.message}`);
       }
+
+      // Che do fallback Demo truc quan
+      isDemoMode = true;
+      if (modeBadge) {
+        modeBadge.innerText = "🟡 Demo Tương Tác (Sẵn Sàng)";
+        modeBadge.style.color = "#fbbf24";
+        modeBadge.style.background = "rgba(245, 158, 11, 0.2)";
+      }
+      renderDeviceTable(demoDevices);
+      addLog("💡 Đang ở Chế độ Demo: Sinh viên có thể bấm 'Mượn' và BQL có thể 'Nghiệm thu hoàn cọc' trực tiếp trên giao diện!");
     }
 
     async function borrowDevice(id, depositEth) {
-      if (!contract) return alert("Vui lòng kết nối ví trước!");
+      if (isDemoMode) {
+        const dev = demoDevices.find(d => d.id === id);
+        if (!dev) return alert("Không tìm thấy thiết bị!");
+        if (dev.trangThai !== 0) return alert("Thiết bị này hiện không ở trạng thái sẵn sàng!");
+
+        const borrowerAddr = userAddress || "0x23K4300040...HuyenTrang";
+        const confirmed = confirm(`Xác nhận đặt cọc ${depositEth} ETH để mượn thiết bị #${id} (${dev.ten})?\n\nTiền cọc sẽ được ký quỹ minh bạch và hoàn trả khi bạn trả lại thiết bị.`);
+        if (!confirmed) return;
+
+        addLog(`Đang xử lý ký quỹ đặt cọc ${depositEth} ETH cho thiết bị #${id}...`);
+        setTimeout(() => {
+          dev.trangThai = 1;
+          dev.nguoiMuon = borrowerAddr;
+          renderDeviceTable(demoDevices);
+          addLog(`✅ Sinh viên (${borrowerAddr}) đã đặt cọc ${depositEth} ETH và mượn thành công thiết bị #${id}!`);
+          alert(`🎉 Chúc mừng!\nBạn đã đặt cọc ${depositEth} ETH và mượn thành công: "${dev.ten}".\nTrạng thái đã chuyển sang [Đang mượn].`);
+        }, 300);
+        return;
+      }
+
+      // Che do on-chain Sepolia
+      if (!signer) {
+        await connectWallet();
+        if (!signer) return;
+      }
+
       try {
-        addLog(`Đang gửi giao dịch đặt cọc & mượn thiết bị #${id} (${depositEth} ETH)...`);
+        addLog(`Đang gửi giao dịch đặt cọc & mượn thiết bị #${id} (${depositEth} ETH) lên Sepolia...`);
         const tx = await contract.muonThietBi(id, {
           value: ethers.utils.parseEther(depositEth)
         });
-        addLog(`Đã gửi TxHash: ${tx.hash}. Đang chờ xác thực khối...`);
+        addLog(`Đã gửi TxHash: ${tx.hash}. Đang chờ đào block...`);
         await tx.wait();
-        alert("Chúc mừng! Đặt cọc và mượn thiết bị thành công!");
+        alert("🎉 Chúc mừng! Giao dịch thành công, bạn đã mượn thiết bị!");
         addLog(`Giao dịch hoàn tất! Đã mượn thành công thiết bị #${id}`);
         loadContractData();
       } catch (err) {
@@ -497,19 +580,40 @@
     }
 
     async function addNewDevice() {
-      if (!contract) return alert("Vui lòng kết nối ví trước!");
       const name = document.getElementById("newDeviceName").value.trim();
       const depositEth = document.getElementById("newDeviceDeposit").value;
 
       if (!name || !depositEth) return alert("Vui lòng điền đủ tên và mức cọc!");
 
+      if (isDemoMode) {
+        const newId = demoDevices.length + 1;
+        demoDevices.push({
+          id: newId,
+          ten: name,
+          tienCocEth: parseFloat(depositEth).toFixed(3),
+          trangThai: 0,
+          nguoiMuon: ""
+        });
+        renderDeviceTable(demoDevices);
+        addLog(`Quản trị viên đã thêm thiết bị mới: "${name}" (#${newId}) với cọc ${depositEth} ETH.`);
+        alert("✅ Đã thêm thiết bị mới thành công vào kho!");
+        document.getElementById("newDeviceName").value = "";
+        document.getElementById("newDeviceDeposit").value = "";
+        return;
+      }
+
+      if (!signer) {
+        await connectWallet();
+        if (!signer) return;
+      }
+
       try {
         const depositWei = ethers.utils.parseEther(depositEth);
-        addLog(`Quản trị viên đang thêm thiết bị "${name}" với cọc ${depositEth} ETH...`);
+        addLog(`Quản trị viên đang thêm thiết bị "${name}" với cọc ${depositEth} ETH lên Sepolia...`);
         const tx = await contract.themThietBi(name, depositWei);
         addLog(`Đã gửi TxHash: ${tx.hash}`);
         await tx.wait();
-        alert("Đã thêm thiết bị mới thành công!");
+        alert("Đã thêm thiết bị mới thành công lên Blockchain!");
         document.getElementById("newDeviceName").value = "";
         document.getElementById("newDeviceDeposit").value = "";
         loadContractData();
@@ -519,15 +623,39 @@
     }
 
     async function returnAndRefund() {
-      if (!contract) return alert("Vui lòng kết nối ví trước!");
-      const id = document.getElementById("returnDeviceId").value;
-      const bps = document.getElementById("returnDeductionBps").value || "0";
+      const id = parseInt(document.getElementById("returnDeviceId").value);
+      const bps = parseInt(document.getElementById("returnDeductionBps").value || "0");
 
       if (!id) return alert("Vui lòng nhập ID thiết bị!");
 
+      if (isDemoMode) {
+        const dev = demoDevices.find(d => d.id === id);
+        if (!dev) return alert(`Không tìm thấy thiết bị #${id}!`);
+        if (dev.trangThai !== 1) return alert(`Thiết bị #${id} hiện không ở trạng thái đang mượn!`);
+
+        const totalCoc = parseFloat(dev.tienCocEth);
+        const khauTru = (totalCoc * bps) / 10000;
+        const hoanTra = totalCoc - khauTru;
+
+        dev.trangThai = 0;
+        const prevBorrower = dev.nguoiMuon;
+        dev.nguoiMuon = "";
+        renderDeviceTable(demoDevices);
+
+        addLog(`👑 Nghiệm thu thiết bị #${id}: Khấu trừ phạt ${khauTru.toFixed(4)} ETH (${bps} bps), Hoàn trả ${hoanTra.toFixed(4)} ETH về ví sinh viên.`);
+        alert(`✅ Nghiệm thu thành công thiết bị #${id}!\n- Tiền cọc ban đầu: ${totalCoc} ETH\n- Phạt khấu trừ (${bps/100}%): ${khauTru.toFixed(4)} ETH\n- Đã hoàn trả: ${hoanTra.toFixed(4)} ETH\nThiết bị đã sẵn sàng cho lượt mượn tiếp theo.`);
+        document.getElementById("returnDeviceId").value = "";
+        return;
+      }
+
+      if (!signer) {
+        await connectWallet();
+        if (!signer) return;
+      }
+
       try {
         addLog(`Owner đang xác nhận hoàn trả thiết bị #${id} (khấu trừ ${bps} bps)...`);
-        const tx = await contract.traVaHoanCoc(id, parseInt(bps));
+        const tx = await contract.traVaHoanCoc(id, bps);
         addLog(`Đã gửi TxHash: ${tx.hash}`);
         await tx.wait();
         alert("Nghiệm thu thiết bị và hoàn trả tiền cọc thành công!");
@@ -536,6 +664,11 @@
         alert("Lỗi trả và hoàn cọc: " + err.message);
       }
     }
+
+    // Tu dong tai du lieu khi mo trang
+    window.addEventListener("DOMContentLoaded", () => {
+      loadContractData();
+    });
   </script>
 </body>
 
