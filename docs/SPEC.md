@@ -47,7 +47,48 @@ Hệ thống quản lý và tự động hóa quy trình đặt cọc, mượn v
 
 ---
 
-## 5. Trường hợp ngoại lệ
+## 5. Sơ đồ Máy trạng thái & Kiến trúc Luồng nghiệp vụ
+
+### 5.1 Máy trạng thái thiết bị (Device State Machine)
+
+```mermaid
+stateDiagram-v2
+    [*] --> SanSang: Owner themThietBi()
+    SanSang --> DangMuon: Sinh vien muonThietBi(msg.value == cọc)
+    DangMuon --> SanSang: Owner traVaHoanCoc() [Không hỏng / Không trễ]
+    DangMuon --> SanSang: Owner traVaHoanCoc() [Khấu trừ hao mòn/phạt trễ]
+    SanSang --> BaoTri: Owner capNhatBaoTri(true)
+    BaoTri --> SanSang: Owner capNhatBaoTri(false)
+```
+
+### 5.2 Trình tự Luồng ký quỹ & Hoàn tiền (Sequence Flow)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor SV as Sinh viên mượn
+    participant UI as Giao diện Web3 DApp
+    participant SC as Smart Contract (SmartRent)
+    actor AD as Quản trị viên CLB
+
+    AD->>SC: themThietBi(ten, tienCocWei)
+    SC-->>UI: Event ThietBiMoi / Cập nhật danh mục kho
+    SV->>UI: Chọn thiết bị, bấm "Mượn thiết bị"
+    UI->>SC: muonThietBi(id) kèm msg.value (ETH)
+    SC->>SC: Khóa tiền cọc, cập nhật DangMuon, gán hanChotTra
+    SC-->>UI: Event Borrowed(borrower, dueTime)
+    Note over SV,AD: Sinh viên sử dụng thiết bị trong phòng lab...
+    SV->>AD: Mang thiết bị đến nghiệm thu tại phòng CLB
+    AD->>UI: Nhập ID thiết bị & tỷ lệ khấu trừ hao mòn (bps)
+    UI->>SC: traVaHoanCoc(id, khauTruBps)
+    SC->>SC: Cập nhật trạng thái SanSang (Effects)
+    SC->>SV: Hoàn tiền (TienCoc - Phat - HaoMon) qua .call (Interactions)
+    SC-->>UI: Event Returned(refundAmount, penaltyAmount)
+```
+
+---
+
+## 6. Trường hợp ngoại lệ
 
 - **E1:** Người dùng gửi thừa hoặc thiếu tiền cọc khi mượn ➔ Revert `WrongDepositAmount()`.
 - **E2:** Người dùng gọi thao tác mượn trên thiết bị đang có người mượn ➔ Revert `WrongState()`.
@@ -56,7 +97,7 @@ Hệ thống quản lý và tự động hóa quy trình đặt cọc, mượn v
 
 ---
 
-## 6. Ngoài phạm vi
+## 7. Ngoài phạm vi
 
 - Hệ thống không định vị GPS vị trí vật lý ngoại đời của thiết bị.
 - Hệ thống không tự động thẩm định mức độ hư hại phần cứng (phải do Thủ kho kiểm tra thực tế rồi nhập tỷ lệ khấu trừ).
