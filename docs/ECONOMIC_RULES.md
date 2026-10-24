@@ -10,14 +10,26 @@ Hệ thống Ký Quỹ Đặt Cọc Mượn Trả Thiết Bị (SmartRent - Ch�
   - Nộp tiền đặt cọc bằng Native ETH vào hợp đồng khi bắt đầu mượn.
   - Được hoàn trả 100% tiền cọc nếu thiết bị được hoàn trả đúng hạn và còn nguyên vẹn.
   - Nếu trả trễ hạn, tiền phạt được tính theo công thức: $\text{Tiền phạt} = \text{Số ngày trễ} \times \text{Mức phạt mỗi ngày}$.
-  - Nhận lại phần tiền cọc còn lại sau khi khấu trừ tiền phạt/hư hại.
+  - Nhận lại phần tiền cọc còn lại sau khi khấu trừ tiền phạt/hư hại: $\text{Tiền hoàn lại} = \text{Tiền cọc} - \text{Tiền phạt} - \text{Phí hao mòn}$.
 - **Bên cho mượn (Ban quản lý Lab / Chủ sở hữu):**
   - Không được quyền rút hoặc chiếm dụng tiền cọc của sinh viên trong thời gian hợp đồng đang ở trạng thái `Borrowed`.
   - Được nhận phần tiền phạt/khấu trừ bồi thường chuyển thẳng vào ví Quản trị viên (`owner`) khi nghiệm thu thiết bị hỏng hoặc trễ hạn.
 
 ---
 
-## 2. Giới hạn chống lạm dụng
+## 2. Bảng Mô Phỏng Kịch Bản Dòng Tiền Thực Tế
+
+| Kịch bản | Tiền cọc ban đầu | Tình trạng trả thiết bị | Tiền phạt trễ | Khấu trừ hao mòn | Sinh viên nhận lại | Quỹ CLB thu |
+| :--- | :---: | :--- | :---: | :---: | :---: | :---: |
+| **1. Chuẩn mẫu** | 0.050 ETH | Đúng hạn (0 ngày), nguyên vẹn | 0 ETH | 0 ETH (0%) | **0.050 ETH** (100%) | 0 ETH |
+| **2. Trễ hạn nhẹ** | 0.050 ETH | Trễ 2 ngày (0.005 ETH/ngày) | 0.010 ETH | 0 ETH (0%) | **0.040 ETH** (80%) | 0.010 ETH |
+| **3. Hao mòn nhẹ** | 0.050 ETH | Đúng hạn, trầy xước vỏ ngoài | 0 ETH | 0.010 ETH (20%) | **0.040 ETH** (80%) | 0.010 ETH |
+| **4. Trễ + Hư hại** | 0.050 ETH | Trễ 3 ngày + bể màn hình (40%)| 0.015 ETH | 0.020 ETH (40%) | **0.015 ETH** (30%) | 0.035 ETH |
+| **5. Vi phạm tối đa** | 0.050 ETH | Quá hạn > 14 ngày hoặc làm mất | 0.050 ETH | Không tính thêm | **0 ETH** (0%) | **0.050 ETH** (100%) |
+
+---
+
+## 3. Giới hạn chống lạm dụng
 
 1. **Khóa cọc bất khả xâm phạm:** Không ai (kể cả Owner) có thể rút tiền cọc khi giao dịch đang diễn ra. Tiền chỉ thoát khỏi hợp đồng tại thời điểm nghiệm thu trả thiết bị.
 2. **Khống chế trần tiền phạt:** Tổng số tiền phạt và khấu trừ hư hại tối đa bằng 100% tiền cọc đã đóng (`actualPenalty <= depositAmount`). Tiền phạt không bao giờ vượt quá tiền cọc khiến số dư bị âm.
@@ -26,7 +38,7 @@ Hệ thống Ký Quỹ Đặt Cọc Mượn Trả Thiết Bị (SmartRent - Ch�
 
 ---
 
-## 3. Năm phản biện rủi ro và cách khắc phục (Bước 4 Lab 8)
+## 4. Năm phản biện rủi ro và cách khắc phục (Bước 4 Lab 8)
 
 ### Phản biện 1: Tranh chấp mức độ hư hỏng thiết bị
 - *Lỗ hổng chỉ ra:* Chủ sở hữu có thể cố tình báo thiết bị hỏng nặng để khấu trừ tối đa 100% tiền cọc của sinh viên nhằm chiếm đoạt tài sản.
