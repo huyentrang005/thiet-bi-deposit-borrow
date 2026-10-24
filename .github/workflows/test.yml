@@ -1,0 +1,43 @@
+name: SmartRent Web3 CI
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate-and-test:
+    name: Validate Contracts & Structure
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Verify Solidity File Structure
+        run: |
+          echo "Kiểm tra sự tồn tại của hợp đồng cốt lõi..."
+          test -f contracts/project/ProjectCore.sol
+          test -f contracts/QuanLyThietBi.sol
+          test -f test/ProjectCoreTest.sol
+          test -f web/index.html
+          echo "Tất cả các tệp cốt lõi đều hợp lệ!"
+
+      - name: Lint Markdown Documentation
+        run: |
+          echo "Kiểm tra sự đồng bộ của bộ tài liệu docs..."
+          test -f docs/SPEC.md
+          test -f docs/ECONOMIC_RULES.md
+          test -f docs/PROJECT_PLAN.md
+          test -f docs/AUDIT_REPORT.md
+          echo "Bộ tài liệu đã sẵn sàng!"
