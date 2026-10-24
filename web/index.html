@@ -4,38 +4,50 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DApp Quản Lý Đặt Cọc Mượn Trả Thiết Bị - Web3 Sepolia</title>
+  <title>EquiTech SmartRent — Ký Quỹ Mượn Trả Thiết Bị CLB EquiTech</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <!-- Ethers.js v5 -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/ethers/5.7.2/ethers.umd.min.js"></script>
+
   <style>
     :root {
-      --primary: #4f46e5;
-      --primary-hover: #4338ca;
+      --bg: #070b14;
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --card-border: rgba(99, 102, 241, 0.2);
+      --card-hover-border: rgba(129, 140, 248, 0.4);
+      --primary: #6366f1;
+      --primary-hover: #4f46e5;
+      --primary-glow: rgba(99, 102, 241, 0.35);
+      --accent: #06b6d4;
       --success: #10b981;
+      --success-glow: rgba(16, 185, 129, 0.25);
       --warning: #f59e0b;
+      --warning-glow: rgba(245, 158, 11, 0.25);
       --danger: #ef4444;
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --border: #334155;
       --text: #f8fafc;
       --text-muted: #94a3b8;
+      --mono: 'JetBrains Mono', monospace;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: 'Inter', sans-serif;
     }
 
     body {
       background-color: var(--bg);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.15) 0px, transparent 50%),
+        radial-gradient(at 100% 0%, rgba(6, 182, 212, 0.15) 0px, transparent 50%),
+        radial-gradient(at 50% 100%, rgba(79, 70, 229, 0.1) 0px, transparent 50%);
+      background-attachment: fixed;
       color: var(--text);
+      font-family: 'Inter', sans-serif;
       min-height: 100vh;
-      padding: 24px 16px;
+      padding: 24px 16px 60px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -43,21 +55,60 @@
 
     .container {
       width: 100%;
-      max-width: 900px;
+      max-width: 960px;
       display: flex;
       flex-direction: column;
       gap: 20px;
     }
 
+    /* HEADER & BRANDING */
     header {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
       text-align: center;
-      padding: 20px 0;
+      padding: 16px 0 10px;
+      position: relative;
+    }
+
+    .brand-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(6, 182, 212, 0.15));
+      border: 1px solid rgba(129, 140, 248, 0.3);
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #a5b4fc;
+      margin-bottom: 12px;
+      box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+    }
+
+    .brand-pill .dot {
+      width: 8px;
+      height: 8px;
+      background: #34d399;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #34d399;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(0.85); }
     }
 
     header h1 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #818cf8, #c084fc);
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 800;
+      line-height: 1.2;
+      background: linear-gradient(135deg, #ffffff 20%, #a5b4fc 60%, #38bdf8 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       margin-bottom: 8px;
@@ -66,111 +117,102 @@
     header p {
       color: var(--text-muted);
       font-size: 0.95rem;
+      max-width: 650px;
     }
 
+    /* CARD SYSTEM */
     .card {
       background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 20px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 22px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      border-color: var(--card-hover-border);
     }
 
     .card-title {
+      font-family: 'Outfit', sans-serif;
       font-size: 1.15rem;
-      font-weight: 600;
-      margin-bottom: 16px;
+      font-weight: 700;
+      color: #f1f5f9;
       display: flex;
       align-items: center;
-      gap: 8px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 10px;
+      gap: 10px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
     }
 
-    .btn {
-      background: var(--primary);
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 8px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      font-size: 0.9rem;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .btn:hover {
-      background: var(--primary-hover);
-      transform: translateY(-1px);
-    }
-
-    .btn-success {
-      background: var(--success);
-    }
-    .btn-success:hover {
-      background: #059669;
-    }
-
-    .btn-warning {
-      background: var(--warning);
-    }
-    .btn-warning:hover {
-      background: #d97706;
-    }
-
-    .btn-danger {
-      background: var(--danger);
-    }
-    .btn-danger:hover {
-      background: #dc2626;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-    .badge-ready { background: rgba(16, 185, 129, 0.2); color: #34d399; }
-    .badge-borrowed { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-    .badge-maintenance { background: rgba(239, 68, 68, 0.2); color: #f87171; }
-
-    .grid-2 {
+    /* KPI STATS ROW */
+    .stats-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-    @media (max-width: 640px) {
-      .grid-2 { grid-template-columns: 1fr; }
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
     }
 
-    input, select {
-      width: 100%;
-      background: #0f172a;
-      border: 1px solid var(--border);
-      padding: 10px 14px;
-      border-radius: 8px;
-      color: var(--text);
-      font-size: 0.9rem;
-      margin-top: 6px;
-      outline: none;
-    }
-    input:focus, select:focus {
-      border-color: var(--primary);
+    @media (max-width: 768px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
 
-    .form-group {
-      margin-bottom: 14px;
+    .stat-card {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      border-radius: 12px;
+      padding: 14px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: transform 0.2s ease;
     }
 
-    .form-group label {
-      font-size: 0.85rem;
-      font-weight: 500;
+    .stat-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(99, 102, 241, 0.3);
+    }
+
+    .stat-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      background: rgba(99, 102, 241, 0.15);
+      color: #818cf8;
+    }
+
+    .stat-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stat-value {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .stat-label {
+      font-size: 0.75rem;
       color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    /* WALLET BAR */
+    .wallet-card {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.7), rgba(15, 23, 42, 0.8));
+      border: 1px solid rgba(99, 102, 241, 0.25);
     }
 
     .wallet-bar {
@@ -178,360 +220,1248 @@
       flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      gap: 12px;
+      gap: 14px;
     }
 
-    .wallet-info {
-      font-size: 0.9rem;
+    .wallet-details {
+      display: flex;
+      align-items: center;
+      gap: 14px;
     }
-    .wallet-address {
-      font-family: monospace;
-      color: #a5b4fc;
+
+    .wallet-avatar {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #6366f1, #06b6d4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .wallet-meta {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .wallet-status-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+    }
+
+    .wallet-addr {
+      font-family: var(--mono);
       font-weight: 600;
+      color: #38bdf8;
+      background: rgba(6, 182, 212, 0.1);
+      padding: 2px 8px;
+      border-radius: 6px;
+      border: 1px solid rgba(6, 182, 212, 0.2);
+    }
+
+    .net-badge {
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .net-sepolia { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .net-wrong { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+
+    /* BUTTONS */
+    .btn {
+      background: linear-gradient(135deg, var(--primary), #4338ca);
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 20px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 14px var(--primary-glow);
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px var(--primary-glow);
+      filter: brightness(1.1);
+    }
+
+    .btn:active {
+      transform: translateY(0);
+    }
+
+    .btn-connect {
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      box-shadow: 0 4px 15px rgba(249, 115, 22, 0.3);
+    }
+    .btn-connect:hover {
+      box-shadow: 0 6px 20px rgba(249, 115, 22, 0.45);
+    }
+
+    .btn-connected {
+      background: linear-gradient(135deg, #10b981, #059669);
+      box-shadow: 0 4px 15px var(--success-glow);
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #10b981, #059669);
+      box-shadow: 0 4px 12px var(--success-glow);
+    }
+
+    .btn-warning {
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      box-shadow: 0 4px 12px var(--warning-glow);
+    }
+
+    .btn-secondary {
+      background: rgba(30, 41, 59, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #cbd5e1;
+      box-shadow: none;
+    }
+    .btn-secondary:hover {
+      background: rgba(51, 65, 85, 0.9);
+      color: #fff;
+    }
+
+    .btn-sm {
+      padding: 7px 14px;
+      font-size: 0.82rem;
+      border-radius: 8px;
+    }
+
+    /* BADGES */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 12px;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .badge-ready {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+    .badge-borrowed {
+      background: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+      border: 1px solid rgba(245, 158, 11, 0.3);
+    }
+    .badge-maintenance {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    /* PROTOCOL WARNING ALERT */
+    .alert-banner {
+      background: linear-gradient(135deg, rgba(245, 158, 11, 0.15), rgba(239, 68, 68, 0.15));
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      border-radius: 12px;
+      padding: 14px 18px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      font-size: 0.88rem;
+      color: #fef08a;
+    }
+
+    /* FILTER & SEARCH */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .filter-tabs {
+      display: flex;
+      gap: 6px;
+      background: rgba(15, 23, 42, 0.6);
+      padding: 4px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .tab-btn.active, .tab-btn:hover {
+      background: rgba(99, 102, 241, 0.2);
+      color: #fff;
+    }
+
+    .search-input {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 8px 14px;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 0.85rem;
+      min-width: 200px;
+      outline: none;
+    }
+    .search-input:focus {
+      border-color: var(--primary);
+    }
+
+    /* DEVICE TABLE */
+    .table-container {
+      overflow-x: auto;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin-top: 10px;
       font-size: 0.88rem;
-    }
-
-    th, td {
-      padding: 12px 10px;
       text-align: left;
-      border-bottom: 1px solid var(--border);
     }
 
-    th {
+    thead th {
+      background: rgba(15, 23, 42, 0.8);
       color: var(--text-muted);
-      font-weight: 500;
-      background: rgba(15, 23, 42, 0.5);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-weight: 600;
     }
 
-    .logs-box {
-      background: #090d16;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 12px;
-      height: 150px;
-      overflow-y: auto;
-      font-family: monospace;
-      font-size: 0.8rem;
-      color: #a7f3d0;
+    tbody td {
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      vertical-align: middle;
     }
-    .log-item {
+
+    tbody tr {
+      transition: background 0.15s ease;
+    }
+
+    tbody tr:hover {
+      background: rgba(99, 102, 241, 0.05);
+    }
+
+    .device-title {
+      font-weight: 600;
+      color: #f8fafc;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .device-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .eth-price {
+      font-family: var(--mono);
+      font-weight: 700;
+      color: #38bdf8;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* FORMS & INPUTS */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 640px) {
+      .grid-2 {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-group {
+      margin-bottom: 14px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    input, select {
+      width: 100%;
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 14px;
+      border-radius: 10px;
+      color: #fff;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+    }
+
+    /* TERMINAL LOGS BOX */
+    .terminal-box {
+      background: #050811;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 14px;
+      height: 180px;
+      overflow-y: auto;
+      font-family: var(--mono);
+      font-size: 0.8rem;
+      line-height: 1.6;
+    }
+
+    .log-entry {
+      display: flex;
+      gap: 8px;
       margin-bottom: 6px;
       padding-bottom: 4px;
-      border-bottom: 1px dashed #1e293b;
+      border-bottom: 1px dashed rgba(255, 255, 255, 0.05);
+      animation: fadeIn 0.2s ease;
+    }
+
+    .log-time {
+      color: #64748b;
+      white-space: nowrap;
+    }
+
+    .log-msg {
+      color: #e2e8f0;
+      word-break: break-all;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-3px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* TOAST SYSTEM */
+    #toastContainer {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 9999;
+    }
+
+    .toast {
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid var(--primary);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 10px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(10px);
+      font-size: 0.88rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 280px;
+      animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .toast-success { border-color: #10b981; }
+    .toast-error { border-color: #ef4444; }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
+    /* MODAL */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(6px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+    }
+
+    .modal-content {
+      background: #0f172a;
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      max-width: 480px;
+      width: 100%;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+      animation: zoomIn 0.2s ease;
+    }
+
+    @keyframes zoomIn {
+      from { transform: scale(0.95); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
     }
   </style>
 </head>
 
 <body>
-  <div class="container">
-    <header>
-      <h1>Quản Lý Đặt Cọc Mượn Trả Thiết Bị</h1>
-      <p>Hệ thống Ký quỹ (Escrow) phi tập trung trên mạng Ethereum Sepolia Testnet</p>
-    </header>
+  <div id="toastContainer"></div>
 
-    <!-- Thẻ kết nối ví & Hợp đồng -->
-    <div class="card">
-      <div class="wallet-bar">
-        <div class="wallet-info">
-          <div>Trạng thái ví: <span id="walletAddress" class="wallet-address">Chưa kết nối</span></div>
-          <div id="networkInfo" style="font-size: 0.8rem; color: var(--text-muted); margin-top: 4px;"></div>
+  <!-- MODAL XÁC NHẬN MƯỢN THIẾT BỊ -->
+  <div class="modal-overlay" id="borrowModal">
+    <div class="modal-content">
+      <h3 style="font-family: 'Outfit', sans-serif; font-size: 1.25rem; margin-bottom: 12px; color: #fff;">
+        ⚡ Ký Quỹ Đặt Cọc Mượn Thiết Bị
+      </h3>
+      <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 16px;">
+        Tiền cọc của bạn sẽ được khóa an toàn trong Smart Contract ký quỹ (Escrow) của CLB EquiTech và hoàn trả 100% khi bạn trả lại đồ nguyên vẹn.
+      </p>
+
+      <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 10px; padding: 14px; margin-bottom: 16px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted); font-size: 0.85rem;">Thiết bị:</span>
+          <strong id="modalDeviceName" style="color: #fff; font-size: 0.9rem;">--</strong>
         </div>
-        <button id="btnConnect" class="btn" onclick="connectWallet()">🦊 Kết nối MetaMask</button>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted); font-size: 0.85rem;">Tiền cọc ETH:</span>
+          <span class="eth-price" id="modalDeviceDeposit">-- ETH</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+          <span style="color: var(--text-muted); font-size: 0.85rem;">Thời hạn tiêu chuẩn:</span>
+          <span style="color: #38bdf8; font-size: 0.85rem; font-weight: 500;">3 Ngày</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--text-muted); font-size: 0.85rem;">Phí thuê:</span>
+          <span style="color: #34d399; font-weight: 700; font-size: 0.85rem;">0.00 ETH (Miễn phí CLB)</span>
+        </div>
       </div>
 
-      <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--border);">
-        <label style="font-size: 0.85rem; color: var(--text-muted);">Địa chỉ Hợp đồng QuanLyThietBi trên Sepolia:</label>
-        <div style="display: flex; gap: 8px; margin-top: 6px;">
-          <input type="text" id="contractAddressInput" value="0xC61d78A92B7DfdF85fAB1c22135977721dd96F4c" placeholder="0x... (Dán địa chỉ sau khi deploy Remix)">
-          <button class="btn btn-warning" onclick="loadContractData()" style="white-space: nowrap;">Tải dữ liệu</button>
+      <div style="display: flex; gap: 10px; justify-content: flex-end;">
+        <button class="btn btn-secondary" onclick="closeBorrowModal()">Hủy bỏ</button>
+        <button class="btn btn-success" id="btnConfirmBorrow">Xác Nhận Ký Quỹ & Mượn</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- BRANDING & HEADER -->
+    <header>
+      <div class="brand-pill">
+        <span class="dot"></span>
+        <span>EquiTech Club • Web3 Escrow System</span>
+      </div>
+      <h1>Hệ Thống Mượn Trả Thiết Bị CLB EquiTech</h1>
+      <p>Nền tảng ký quỹ minh bạch cho sinh viên và ban quản lý thiết bị công nghệ phòng Lab trên Ethereum Sepolia</p>
+    </header>
+
+    <!-- CẢNH BÁO FILE:// NẾU NGƯỜI DÙNG KHÔNG CHẠY BẰNG HTTP://LOCALHOST -->
+    <div id="fileProtocolWarning" class="alert-banner" style="display: none;">
+      <div>
+        <strong>⚠️ Lưu ý về ví MetaMask:</strong> Bạn đang mở web qua giao thức <code>file://</code>. Trình duyệt Chrome/Brave thường chặn MetaMask trên file cục bộ.
+      </div>
+      <a href="http://localhost:8000" class="btn btn-warning btn-sm" style="text-decoration: none; white-space: nowrap;">
+        👉 Mở qua http://localhost:8000
+      </a>
+    </div>
+
+    <!-- KPI STATS DASHBOARD -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">📦</div>
+        <div class="stat-info">
+          <span class="stat-value" id="statTotal">5</span>
+          <span class="stat-label">Tổng Thiết Bị</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: rgba(16, 185, 129, 0.15); color: #34d399;">🟢</div>
+        <div class="stat-info">
+          <span class="stat-value" id="statReady" style="color: #34d399;">4</span>
+          <span class="stat-label">Sẵn Sàng</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: rgba(245, 158, 11, 0.15); color: #fbbf24;">🔄</div>
+        <div class="stat-info">
+          <span class="stat-value" id="statBorrowed" style="color: #fbbf24;">1</span>
+          <span class="stat-label">Đang Mượn</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background: rgba(6, 182, 212, 0.15); color: #38bdf8;">💎</div>
+        <div class="stat-info">
+          <span class="stat-value" id="statTVL" style="color: #38bdf8;">0.290 ETH</span>
+          <span class="stat-label">Tổng Cọc Ký Quỹ</span>
         </div>
       </div>
     </div>
 
-    <!-- Danh sách thiết bị -->
+    <!-- WALLET & CONTRACT SETTINGS -->
+    <div class="card wallet-card">
+      <div class="wallet-bar">
+        <div class="wallet-details">
+          <div class="wallet-avatar" id="walletAvatar">🦊</div>
+          <div class="wallet-meta">
+            <div class="wallet-status-row">
+              <span style="color: var(--text-muted); font-size: 0.85rem;">Tài khoản ví:</span>
+              <span id="walletAddress" class="wallet-addr">Chưa kết nối</span>
+              <span id="networkBadge" class="net-badge net-wrong" style="display: none;">Chưa nối</span>
+            </div>
+            <div id="walletBalance" style="font-size: 0.78rem; color: #a5b4fc; font-family: var(--mono); margin-top: 2px;">
+              Số dư: -- Sepolia ETH
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+          <button id="btnConnect" class="btn btn-connect" onclick="handleConnectWallet()">
+            🦊 Kết Nối Ví MetaMask
+          </button>
+        </div>
+      </div>
+
+      <!-- CONTRACT ADDRESS ROW -->
+      <div style="margin-top: 16px; padding-top: 14px; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
+        <label style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted); text-transform: uppercase;">
+          Địa chỉ Smart Contract (Sepolia):
+        </label>
+        <div style="display: flex; gap: 8px; flex: 1; min-width: 280px;">
+          <input type="text" id="contractAddressInput" value="0xC61d78A92B7Dfdf85fAB1c22135977721dd96F4c" style="font-family: var(--mono); font-size: 0.85rem;" placeholder="0x... (Dán địa chỉ sau khi deploy Remix)">
+          <button class="btn btn-secondary btn-sm" onclick="loadContractData()" style="white-space: nowrap;">
+            🔄 Tải Dữ Liệu
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- DANH SÁCH THIẾT BỊ CLB EQUITECH -->
     <div class="card">
       <div class="card-title">
-        <span>📦 Danh Mục Thiết Bị Trong Kho</span>
-        <button class="btn" style="margin-left: auto; padding: 6px 12px; font-size: 0.8rem;" onclick="loadContractData()">🔄 Làm mới</button>
+        <span>📦 Danh Mục Thiết Bị CLB EquiTech</span>
+        <div style="margin-left: auto; display: flex; gap: 10px; align-items: center;">
+          <span id="modeBadge" class="badge" style="background: rgba(99, 102, 241, 0.2); color: #a5b4fc;">
+            Đang tải dữ liệu...
+          </span>
+        </div>
       </div>
-      <div style="overflow-x: auto;">
+
+      <!-- FILTER & SEARCH -->
+      <div class="filter-bar">
+        <div class="filter-tabs">
+          <button class="tab-btn active" onclick="setFilter('all', this)">Tất Cả (<span id="countAll">5</span>)</button>
+          <button class="tab-btn" onclick="setFilter('ready', this)">Sẵn Sàng (<span id="countReady">4</span>)</button>
+          <button class="tab-btn" onclick="setFilter('borrowed', this)">Đang Mượn (<span id="countBorrowed">1</span>)</button>
+        </div>
+        <input type="text" id="searchInput" class="search-input" placeholder="🔍 Tìm thiết bị..." oninput="handleSearch()">
+      </div>
+
+      <div class="table-container">
         <table>
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Tên thiết bị</th>
-              <th>Tiền cọc yêu cầu</th>
-              <th>Trạng thái</th>
-              <th>Người đang mượn</th>
-              <th>Hành động</th>
+              <th style="width: 60px;">ID</th>
+              <th>Tên Thiết Bị & Phân Loại</th>
+              <th>Tiền Cọc Ký Quỹ</th>
+              <th>Trạng Thái</th>
+              <th>Người Đang Mượn</th>
+              <th style="text-align: right;">Hành Động</th>
             </tr>
           </thead>
           <tbody id="deviceTableBody">
             <tr>
-              <td colspan="6" style="text-align: center; color: var(--text-muted);">Đang chờ kết nối và tải dữ liệu từ Blockchain...</td>
+              <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">
+                Đang nạp danh mục thiết bị từ kho EquiTech...
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- Khu vực dành cho Owner (Quản trị viên) -->
-    <div class="card" id="ownerSection">
-      <div class="card-title">👑 Bảng Điều Khiển Quản Trị Viên (Owner)</div>
+    <!-- BẢNG ĐIỀU KHIỂN QUẢN TRỊ VIÊN BQL CLB EQUITECH -->
+    <div class="card" id="adminPanel">
+      <div class="card-title">
+        <span>👑 Bảng Điều Khiển Quản Lý CLB EquiTech (Thủ Kho / Admin)</span>
+      </div>
+
       <div class="grid-2">
-        <!-- Thêm thiết bị mới -->
-        <div>
-          <h4 style="font-size: 0.95rem; margin-bottom: 10px; color: #a5b4fc;">➕ Thêm Thiết Bị Mới</h4>
+        <!-- FORM 1: THÊM THIẾT BỊ MỚI -->
+        <div style="background: rgba(15, 23, 42, 0.5); padding: 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05);">
+          <h4 style="font-family: 'Outfit', sans-serif; font-size: 0.95rem; margin-bottom: 12px; color: #a5b4fc; display: flex; align-items: center; gap: 6px;">
+            <span>➕</span> Thêm Thiết Bị Mới Vào Kho
+          </h4>
           <div class="form-group">
             <label>Tên thiết bị:</label>
-            <input type="text" id="newDeviceName" placeholder="Ví dụ: Máy ảnh Canon EOS R5">
+            <input type="text" id="newDeviceName" placeholder="Ví dụ: Máy ảnh Sony Alpha A6400">
           </div>
           <div class="form-group">
-            <label>Tiền đặt cọc (ETH):</label>
+            <label>Mức tiền cọc yêu cầu (ETH):</label>
             <input type="number" step="0.001" id="newDeviceDeposit" placeholder="Ví dụ: 0.05">
           </div>
-          <button class="btn btn-success" onclick="addNewDevice()">Lưu vào Blockchain</button>
+          <button class="btn btn-primary" style="width: 100%;" onclick="addNewDevice()">
+            💾 Lưu Thiết Bị Vào Kho
+          </button>
         </div>
 
-        <!-- Trả thiết bị & Hoàn cọc (Nghiệm thu) -->
-        <div>
-          <h4 style="font-size: 0.95rem; margin-bottom: 10px; color: #a5b4fc;">✅ Nghiệm Thu Trả & Hoàn Cọc</h4>
+        <!-- FORM 2: NGHIỆM THU TRẢ & HOÀN CỌC -->
+        <div style="background: rgba(15, 23, 42, 0.5); padding: 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05);">
+          <h4 style="font-family: 'Outfit', sans-serif; font-size: 0.95rem; margin-bottom: 12px; color: #38bdf8; display: flex; align-items: center; gap: 6px;">
+            <span>✅</span> Nghiệm Thu Trả & Tự Động Hoàn Cọc
+          </h4>
           <div class="form-group">
-            <label>ID Thiết bị cần thu hồi:</label>
-            <input type="number" id="returnDeviceId" placeholder="Ví dụ: 1">
+            <label>ID thiết bị cần thu hồi:</label>
+            <input type="number" id="returnDeviceId" placeholder="Nhập ID (Ví dụ: 1 hoặc 3)">
           </div>
           <div class="form-group">
-            <label>Tỷ lệ phạt khấu trừ (Basis point: 100 = 1%):</label>
+            <label>Khấu trừ phạt hư hại / Trễ hạn (Bps):</label>
             <input type="number" id="returnDeductionBps" placeholder="0 = Hoàn 100%, 500 = Trừ 5%" value="0">
+            <div style="display: flex; gap: 6px; margin-top: 6px;">
+              <button class="btn btn-secondary btn-sm" type="button" onclick="setBps(0)">0% (Đúng hạn)</button>
+              <button class="btn btn-secondary btn-sm" type="button" onclick="setBps(500)">5% (Trễ 1 ngày)</button>
+              <button class="btn btn-secondary btn-sm" type="button" onclick="setBps(1000)">10% (Trễ 2 ngày)</button>
+            </div>
           </div>
-          <button class="btn btn-warning" onclick="returnAndRefund()">Xác nhận & Hoàn cọc</button>
+          <button class="btn btn-warning" style="width: 100%;" onclick="returnAndRefund()">
+            💸 Nghiệm Thu & Giải Ngân Hoàn Cọc
+          </button>
         </div>
       </div>
     </div>
 
-    <!-- Nhật ký sự kiện Blockchain -->
+    <!-- TERMINAL SỰ KIỆN BLOCKCHAIN REAL-TIME -->
     <div class="card">
-      <div class="card-title">📡 Nhật Ký Sự Kiện Real-time (Event Logs)</div>
-      <div class="logs-box" id="eventLogs">
-        <div class="log-item" style="color: var(--text-muted);">Chưa có sự kiện nào được ghi nhận.</div>
+      <div class="card-title">
+        <span style="display: flex; align-items: center; gap: 8px;">
+          <span style="color: #34d399; font-size: 0.8rem;">●</span> Nhật Ký Sự Kiện Hợp Đồng (Real-Time Terminal)
+        </span>
+        <button class="btn btn-secondary btn-sm" style="margin-left: auto;" onclick="clearLogs()">
+          🗑️ Xóa Nhật Ký
+        </button>
+      </div>
+      <div class="terminal-box" id="eventLogs">
+        <div class="log-entry">
+          <span class="log-time">[HỆ THỐNG]</span>
+          <span class="log-msg" style="color: #38bdf8;">Đã sẵn sàng. Kết nối ví MetaMask để bắt đầu giao dịch mượn thiết bị CLB EquiTech.</span>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    // ABI chuẩn của hợp đồng ProjectCore.sol và QuanLyThietBi.sol
+    // ABI chuẩn của hợp đồng QuanLyThietBi.sol
     const contractABI = [
-      "function tongThietBi() public view returns (uint256)",
       "function tongSoThietBi() public view returns (uint256)",
-      "function danhSachThietBi(uint256) public view returns (uint256 id, string memory ten, uint256 tienCoc, uint256 thoiHanMuon, uint256 phiPhatMoiNgay, uint8 trangThai, address nguoiMuon, uint256 thoiDiemMuon, uint256 hanChotTra)",
+      "function tongThietBi() public view returns (uint256)",
       "function layThongTinThietBi(uint256 _id) public view returns (uint256 id, string memory tenThietBi, uint256 tienCoc, uint8 trangThai, address nguoiMuon, uint256 thoiDiemMuon)",
-      "function themThietBi(string calldata _ten, uint256 _tienCoc, uint256 _thoiHanMuon, uint256 _phiPhatMoiNgay) external",
+      "function danhSachThietBi(uint256) public view returns (uint256 id, string memory ten, uint256 tienCoc, uint8 trangThai, address nguoiMuon, uint256 thoiDiemMuon)",
       "function themThietBi(string calldata _tenThietBi, uint256 _tienCoc) external",
       "function capNhatBaoTri(uint256 _id, bool _laBaoTri) external",
       "function muonThietBi(uint256 _id) external payable",
       "function traVaHoanCoc(uint256 _id, uint256 _khauTruBps) external",
-      "function tinhTienPhat(uint256 _id, uint256 _thoiDiemTra) public view returns (uint256)",
       "function owner() public view returns (address)",
-      "event ThietBiDaThem(uint256 indexed id, string ten, uint256 tienCoc, uint256 phiPhatMoiNgay)",
       "event ThietBiDaThem(uint256 indexed id, string tenThietBi, uint256 tienCoc)",
-      "event ThietBiDuocMuon(uint256 indexed id, address indexed nguoiMuon, uint256 hanChotTra)",
       "event ThietBiDuocMuon(uint256 indexed id, address indexed nguoiMuon, uint256 tienCoc)",
-      "event ThietBiDaTra(uint256 indexed id, address indexed nguoiMuon, uint256 tienHoan, uint256 tienPhat)",
-      "event ThietBiDaTra(uint256 indexed id, address indexed nguoiMuon)"
+      "event ThietBiDaTra(uint256 indexed id, address indexed nguoiMuon)",
+      "event TienCocDaHoan(uint256 indexed id, address indexed nguoiMuon, uint256 soTienHoan, uint256 soTienKhauTru)"
     ];
 
-    let provider;
-    let signer;
-    let contract;
-    let userAddress = "";
-    let contractOwner = "";
+    const contractAddress = "0xC61d78A92B7Dfdf85fAB1c22135977721dd96F4c";
 
-    function addLog(msg) {
+    let provider = null;
+    let signer = null;
+    let contract = null;
+    let userAddress = "";
+    let isDemoMode = false;
+    let currentFilter = "all";
+    let pendingBorrowId = null;
+    let pendingBorrowDeposit = null;
+
+    // Danh sách thiết bị mẫu chất lượng cao cho CLB EquiTech
+    let demoDevices = [
+      { id: 1, icon: "📷", ten: "Máy ảnh kỹ thuật số Canon EOS R50 (Kèm Lens Kit)", loai: "Thiết bị quay chụp", tienCocEth: "0.050", trangThai: 0, nguoiMuon: "" },
+      { id: 2, icon: "🎛️", ten: "Bộ Kit Vi Điều Khiển STM32 & Cảm Biến IoT SmartHome", loai: "Bộ Kit thực hành", tienCocEth: "0.020", trangThai: 0, nguoiMuon: "" },
+      { id: 3, icon: "📽️", ten: "Máy Chiếu Di Động Full HD Epson CO-FH02 (3000 Ansi)", loai: "Thiết bị hội thảo", tienCocEth: "0.080", trangThai: 1, nguoiMuon: "0x71C84920E3253b76E1A8dCd12A456C6977113A9F" },
+      { id: 4, icon: "📟", ten: "Máy Đo Tín Hiệu Xung Cầm Tay Oscilloscope DS212 Mini", loai: "Thiết bị đo lường", tienCocEth: "0.040", trangThai: 0, nguoiMuon: "" },
+      { id: 5, icon: "🥽", ten: "Kính Thực Tế Ảo VR Meta Quest 2 128GB", loai: "Thiết bị trải nghiệm AR/VR", tienCocEth: "0.100", trangThai: 0, nguoiMuon: "" }
+    ];
+
+    // HIỂN THỊ THÔNG BÁO TOAST
+    function showToast(msg, type = "info") {
+      const container = document.getElementById("toastContainer");
+      const toast = document.createElement("div");
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `<span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span> <span>${msg}</span>`;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.style.animation = "slideIn 0.3s reverse forwards";
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    // GHI NHẬT KÝ VÀO TERMINAL
+    function addLog(msg, type = "info") {
       const logBox = document.getElementById("eventLogs");
       const time = new Date().toLocaleTimeString();
-      const item = document.createElement("div");
-      item.className = "log-item";
-      item.innerText = `[${time}] ${msg}`;
-      logBox.prepend(item);
+      const entry = document.createElement("div");
+      entry.className = "log-entry";
+      let color = "#e2e8f0";
+      if (type === "success") color = "#34d399";
+      if (type === "warn") color = "#fbbf24";
+      if (type === "error") color = "#f87171";
+
+      entry.innerHTML = `<span class="log-time">[${time}]</span> <span class="log-msg" style="color: ${color};">${msg}</span>`;
+      logBox.prepend(entry);
     }
 
-    async function connectWallet() {
+    function clearLogs() {
+      document.getElementById("eventLogs").innerHTML = `
+        <div class="log-entry">
+          <span class="log-time">[${new Date().toLocaleTimeString()}]</span>
+          <span class="log-msg" style="color: #64748b;">Đã xóa toàn bộ nhật ký.</span>
+        </div>
+      `;
+    }
+
+    // HÀM LẤY PROVIDER METAMASK AN TOÀN
+    function getInjectedProvider() {
       if (typeof window.ethereum === "undefined") {
-        return alert("Vui lòng cài đặt ví MetaMask trên trình duyệt!");
+        return null;
       }
+      if (window.ethereum.providers && window.ethereum.providers.length) {
+        const mm = window.ethereum.providers.find(p => p.isMetaMask);
+        if (mm) return mm;
+      }
+      return window.ethereum;
+    }
+
+    // KẾT NỐI VÍ METAMASK (ĐÃ ĐƯỢC CẢI TIẾN TOÀN DIỆN CHỐNG LỖI)
+    async function handleConnectWallet() {
+      const eth = getInjectedProvider();
+
+      // Kiểm tra nếu người dùng mở qua file://
+      if (window.location.protocol === "file:") {
+        document.getElementById("fileProtocolWarning").style.display = "flex";
+      }
+
+      if (!eth) {
+        showToast("Không tìm thấy tiện ích MetaMask trên trình duyệt!", "error");
+        addLog("Không phát hiện ví MetaMask. Vui lòng cài đặt MetaMask Extension tại metamask.io hoặc mở trang tại http://localhost:8000", "error");
+        
+        // Cung cấp lựa chọn dùng ví thử nghiệm
+        const useDemo = confirm("Không phát hiện ví MetaMask trên trình duyệt này!\n\nBạn có muốn kích hoạt 'Ví Giả Lập Sinh Viên' để trải nghiệm mượn thiết bị ngay không?");
+        if (useDemo) {
+          userAddress = "0x23K4300040E05...HuyenTrang";
+          updateWalletUI(userAddress, 11155111, "0.500");
+          addLog("Đã kích hoạt ví thử nghiệm sinh viên: " + userAddress, "success");
+          showToast("Đã kích hoạt ví thử nghiệm thành công!", "success");
+        }
+        return;
+      }
+
+      const btn = document.getElementById("btnConnect");
+      btn.innerText = "⏳ Đang kết nối...";
 
       try {
-        await window.ethereum.request({ method: "eth_requestAccounts" });
-        provider = new ethers.providers.Web3Provider(window.ethereum);
-        const network = await provider.getNetwork();
+        addLog("Đang gửi yêu cầu eth_requestAccounts đến MetaMask...", "info");
+        const accounts = await eth.request({ method: "eth_requestAccounts" });
 
-        document.getElementById("networkInfo").innerText = `Mạng: ${network.name} (Chain ID: ${network.chainId})`;
-        if (network.chainId !== 11155111) {
-          alert("Lưu ý: Vui lòng chuyển sang mạng Sepolia Testnet trên MetaMask để thực hiện giao dịch!");
+        if (!accounts || accounts.length === 0) {
+          throw new Error("Không nhận được tài khoản ví nào từ MetaMask.");
         }
 
+        userAddress = accounts[0];
+        
+        // Khởi tạo Web3Provider với cờ "any" để tránh lỗi NETWORK_CHANGED
+        provider = new ethers.providers.Web3Provider(eth, "any");
         signer = provider.getSigner();
-        userAddress = await signer.getAddress();
-        document.getElementById("walletAddress").innerText = `${userAddress.substring(0, 6)}...${userAddress.substring(38)}`;
-        document.getElementById("btnConnect").innerText = "Đã kết nối ví";
 
+        // Kiểm tra mạng Sepolia (Chain ID 11155111 - Hex 0xaa36a7)
+        let network = await provider.getNetwork();
+        if (network.chainId !== 11155111) {
+          addLog(`Đang ở mạng khác (${network.name} - ${network.chainId}). Đang yêu cầu MetaMask chuyển sang Sepolia...`, "warn");
+          try {
+            await eth.request({
+              method: 'wallet_switchEthereumChain',
+              params: [{ chainId: '0xaa36a7' }],
+            });
+            network = await provider.getNetwork();
+          } catch (switchError) {
+            // Lỗi 4902: Mạng Sepolia chưa có trong danh sách ví, tự động thêm
+            if (switchError.code === 4902) {
+              await eth.request({
+                method: 'wallet_addEthereumChain',
+                params: [{
+                  chainId: '0xaa36a7',
+                  chainName: 'Sepolia Testnet',
+                  nativeCurrency: { name: 'SepoliaETH', symbol: 'ETH', decimals: 18 },
+                  rpcUrls: ['https://ethereum-sepolia-rpc.publicnode.com'],
+                  blockExplorerUrls: ['https://sepolia.etherscan.io']
+                }]
+              });
+            } else {
+              showToast("Vui lòng xác nhận chuyển ví sang mạng Sepolia!", "warn");
+            }
+          }
+        }
+
+        // Lấy số dư ETH
+        let balanceEth = "0.000";
+        try {
+          const bal = await provider.getBalance(userAddress);
+          balanceEth = parseFloat(ethers.utils.formatEther(bal)).toFixed(4);
+        } catch (e) {}
+
+        updateWalletUI(userAddress, network.chainId, balanceEth);
+        addLog(`Kết nối thành công ví: ${userAddress} (Mạng Sepolia - Số dư: ${balanceEth} ETH)`, "success");
+        showToast("Đã kết nối ví MetaMask thành công!", "success");
+
+        // Lắng nghe sự kiện chuyển ví / đổi mạng
+        eth.removeAllListeners?.('accountsChanged');
+        eth.removeAllListeners?.('chainChanged');
+        
+        eth.on?.('accountsChanged', (accs) => {
+          if (accs.length === 0) {
+            resetWalletUI();
+          } else {
+            userAddress = accs[0];
+            handleConnectWallet();
+          }
+        });
+
+        eth.on?.('chainChanged', () => {
+          window.location.reload();
+        });
+
+        // Tải lại dữ liệu hợp đồng
         loadContractData();
+
       } catch (err) {
-        alert("Lỗi kết nối ví: " + err.message);
+        console.error("Lỗi kết nối:", err);
+        btn.innerText = "🦊 Kết Nối Ví MetaMask";
+        if (err.code === -32002) {
+          showToast("Yêu cầu kết nối đang chờ trong tiện ích MetaMask. Hãy bấm vào biểu tượng con cáo trên góc trình duyệt!", "warn");
+          addLog("Cửa sổ MetaMask đang mở chờ xác nhận. Vui lòng bấm vào icon MetaMask để duyệt!", "warn");
+        } else {
+          showToast("Lỗi kết nối: " + (err.message || err), "error");
+          addLog("Kết nối thất bại: " + err.message, "error");
+        }
       }
     }
 
-    async function loadContractData() {
-      const address = document.getElementById("contractAddressInput").value.trim();
-      if (!address || !ethers.utils.isAddress(address)) {
-        return alert("Vui lòng nhập địa chỉ Contract hợp lệ trên Sepolia!");
+    function updateWalletUI(addr, chainId, balance) {
+      const shortAddr = `${addr.substring(0, 6)}...${addr.substring(addr.length - 4)}`;
+      document.getElementById("walletAddress").innerText = shortAddr;
+      document.getElementById("walletBalance").innerText = `Số dư ví: ${balance} Sepolia ETH`;
+      
+      const netBadge = document.getElementById("networkBadge");
+      netBadge.style.display = "inline-flex";
+      if (chainId === 11155111) {
+        netBadge.className = "net-badge net-sepolia";
+        netBadge.innerText = "● Sepolia Testnet";
+      } else {
+        netBadge.className = "net-badge net-wrong";
+        netBadge.innerText = "● Sai Mạng";
       }
+
+      const btn = document.getElementById("btnConnect");
+      btn.className = "btn btn-connected";
+      btn.innerText = `🦊 Đã Kết Nối (${shortAddr})`;
+    }
+
+    function resetWalletUI() {
+      userAddress = "";
+      signer = null;
+      document.getElementById("walletAddress").innerText = "Chưa kết nối";
+      document.getElementById("walletBalance").innerText = "Số dư: -- Sepolia ETH";
+      document.getElementById("networkBadge").style.display = "none";
+      const btn = document.getElementById("btnConnect");
+      btn.className = "btn btn-connect";
+      btn.innerText = "🦊 Kết Nối Ví MetaMask";
+    }
+
+    // TẢI DỮ LIỆU THIẾT BỊ (ON-CHAIN HOẶC DEMO INTERACTIVE)
+    async function loadContractData() {
+      const inputVal = document.getElementById("contractAddressInput").value.trim();
+      const address = inputVal || contractAddress;
+      const modeBadge = document.getElementById("modeBadge");
 
       if (!provider) {
-        provider = new ethers.providers.Web3Provider(window.ethereum || window.web3);
+        const eth = getInjectedProvider();
+        if (eth) {
+          provider = new ethers.providers.Web3Provider(eth, "any");
+        } else {
+          provider = new ethers.providers.JsonRpcProvider("https://ethereum-sepolia-rpc.publicnode.com");
+        }
       }
-      signer = provider.getSigner();
-      contract = new ethers.Contract(address, contractABI, signer);
 
-      try {
-        try { contractOwner = await contract.owner(); } catch (e) {}
-
-        let total;
+      let loadedOnChain = false;
+      if (address && ethers.utils.isAddress(address)) {
         try {
-          total = await contract.tongThietBi();
-        } catch (e) {
-          total = await contract.tongSoThietBi();
+          const testContract = new ethers.Contract(address, contractABI, signer || provider);
+          let total;
+          try {
+            total = await testContract.tongSoThietBi();
+          } catch (e) {
+            total = await testContract.tongThietBi();
+          }
+
+          if (total && total.toNumber() >= 0) {
+            contract = testContract;
+            isDemoMode = false;
+            loadedOnChain = true;
+            modeBadge.innerText = "🟢 Sepolia Testnet (On-Chain)";
+            modeBadge.className = "badge badge-ready";
+
+            const onChainDevices = [];
+            for (let i = 1; i <= total.toNumber(); i++) {
+              let tb;
+              try {
+                tb = await contract.layThongTinThietBi(i);
+                onChainDevices.push({
+                  id: i,
+                  icon: "🔧",
+                  ten: tb.tenThietBi || tb[1],
+                  loai: "Thiết bị phòng Lab",
+                  tienCocEth: ethers.utils.formatEther(tb.tienCoc || tb[2]),
+                  trangThai: tb.trangThai !== undefined ? tb.trangThai : tb[3],
+                  nguoiMuon: tb.nguoiMuon || tb[4]
+                });
+              } catch (e) {
+                tb = await contract.danhSachThietBi(i);
+                onChainDevices.push({
+                  id: i,
+                  icon: "🔧",
+                  ten: tb.ten || tb.tenThietBi || tb[1],
+                  loai: "Thiết bị phòng Lab",
+                  tienCocEth: ethers.utils.formatEther(tb.tienCoc || tb[2]),
+                  trangThai: tb.trangThai !== undefined ? tb.trangThai : tb[3],
+                  nguoiMuon: tb.nguoiMuon || tb[4]
+                });
+              }
+            }
+
+            renderDeviceTable(onChainDevices);
+            updateStats(onChainDevices);
+            addLog(`Đã tải thành công ${total.toNumber()} thiết bị từ Smart Contract trên Sepolia!`, "success");
+            return;
+          }
+        } catch (err) {
+          console.warn("Không đọc được dữ liệu contract, chuyển sang chế độ Demo EquiTech:", err);
+        }
+      }
+
+      // Chế độ Demo Interactive
+      isDemoMode = true;
+      modeBadge.innerText = "🟡 Demo Tương Tác (CLB EquiTech)";
+      modeBadge.className = "badge badge-borrowed";
+      renderDeviceTable(demoDevices);
+      updateStats(demoDevices);
+      addLog("Đang kích hoạt Chế độ Thử nghiệm EquiTech: Bạn có thể bấm mượn và hoàn cọc trực tiếp trên giao diện!", "info");
+    }
+
+    function updateStats(devices) {
+      const total = devices.length;
+      const ready = devices.filter(d => d.trangThai === 0).length;
+      const borrowed = devices.filter(d => d.trangThai === 1).length;
+      const tvl = devices.reduce((sum, d) => sum + parseFloat(d.tienCocEth), 0);
+
+      document.getElementById("statTotal").innerText = total;
+      document.getElementById("statReady").innerText = ready;
+      document.getElementById("statBorrowed").innerText = borrowed;
+      document.getElementById("statTVL").innerText = `${tvl.toFixed(3)} ETH`;
+
+      document.getElementById("countAll").innerText = total;
+      document.getElementById("countReady").innerText = ready;
+      document.getElementById("countBorrowed").innerText = borrowed;
+    }
+
+    function renderDeviceTable(devices) {
+      const tbody = document.getElementById("deviceTableBody");
+      tbody.innerHTML = "";
+
+      // Áp dụng bộ lọc và tìm kiếm
+      const search = (document.getElementById("searchInput")?.value || "").toLowerCase();
+      const filtered = devices.filter(item => {
+        const matchSearch = item.ten.toLowerCase().includes(search) || item.loai?.toLowerCase().includes(search);
+        if (currentFilter === "ready") return matchSearch && item.trangThai === 0;
+        if (currentFilter === "borrowed") return matchSearch && item.trangThai === 1;
+        return matchSearch;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">Không tìm thấy thiết bị nào phù hợp.</td></tr>`;
+        return;
+      }
+
+      filtered.forEach(item => {
+        const tr = document.createElement("tr");
+        let statusBadge = "";
+        let actionBtn = "";
+
+        if (item.trangThai === 0) {
+          statusBadge = `<span class="badge badge-ready">● Sẵn sàng</span>`;
+          actionBtn = `<button class="btn btn-success btn-sm" onclick="openBorrowModal(${item.id}, '${item.ten.replace(/'/g, "\\'")}', '${item.tienCocEth}')">Mượn (${item.tienCocEth} ETH)</button>`;
+        } else if (item.trangThai === 1) {
+          statusBadge = `<span class="badge badge-borrowed">● Đang mượn</span>`;
+          actionBtn = `<span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">🔒 Đang sử dụng</span>`;
+        } else {
+          statusBadge = `<span class="badge badge-maintenance">● Bảo trì</span>`;
+          actionBtn = `<span style="font-size: 0.8rem; color: var(--danger);">Tạm dừng</span>`;
         }
 
-        const tbody = document.getElementById("deviceTableBody");
-        tbody.innerHTML = "";
+        const borrower = item.nguoiMuon && item.nguoiMuon !== ethers.constants.AddressZero ?
+          `${item.nguoiMuon.substring(0, 6)}...${item.nguoiMuon.substring(item.nguoiMuon.length - 4)}` : "--";
 
-        if (total.toNumber() === 0) {
-          tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted);">Kho chưa có thiết bị nào. Quản trị viên hãy thêm thiết bị mới bên dưới!</td></tr>`;
+        tr.innerHTML = `
+          <td style="font-family: var(--mono); font-weight: 700; color: #a5b4fc;">#${item.id}</td>
+          <td>
+            <div class="device-title">
+              <div class="device-icon">${item.icon || '📦'}</div>
+              <div>
+                <div>${item.ten}</div>
+                <div style="font-size: 0.75rem; color: var(--text-muted);">${item.loai || 'Thiết bị CLB'}</div>
+              </div>
+            </div>
+          </td>
+          <td><span class="eth-price">♦ ${item.tienCocEth} ETH</span></td>
+          <td>${statusBadge}</td>
+          <td><span style="font-family: var(--mono); color: #cbd5e1; font-size: 0.82rem;">${borrower}</span></td>
+          <td style="text-align: right;">${actionBtn}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // MODAL XÁC NHẬN MƯỢN THIẾT BỊ
+    function openBorrowModal(id, name, deposit) {
+      pendingBorrowId = id;
+      pendingBorrowDeposit = deposit;
+      document.getElementById("modalDeviceName").innerText = name;
+      document.getElementById("modalDeviceDeposit").innerText = `♦ ${deposit} ETH`;
+      document.getElementById("borrowModal").style.display = "flex";
+
+      document.getElementById("btnConfirmBorrow").onclick = executeBorrow;
+    }
+
+    function closeBorrowModal() {
+      document.getElementById("borrowModal").style.display = "none";
+      pendingBorrowId = null;
+      pendingBorrowDeposit = null;
+    }
+
+    async function executeBorrow() {
+      const id = pendingBorrowId;
+      const depositEth = pendingBorrowDeposit;
+      closeBorrowModal();
+
+      if (isDemoMode) {
+        const dev = demoDevices.find(d => d.id === id);
+        if (!dev || dev.trangThai !== 0) {
+          showToast("Thiết bị không khả dụng!", "error");
           return;
         }
 
-        for (let i = 1; i <= total.toNumber(); i++) {
-          let tb;
-          let tenThietBi = "";
-          let tienCocWei;
-          let trangThaiNum = 0;
-          let nguoiMuonAddr = ethers.constants.AddressZero;
-
-          try {
-            tb = await contract.danhSachThietBi(i);
-            tenThietBi = tb.ten || tb[1];
-            tienCocWei = tb.tienCoc || tb[2];
-            trangThaiNum = tb.trangThai !== undefined ? tb.trangThai : tb[5];
-            nguoiMuonAddr = tb.nguoiMuon || tb[6];
-          } catch (e) {
-            tb = await contract.layThongTinThietBi(i);
-            tenThietBi = tb.tenThietBi || tb[1];
-            tienCocWei = tb.tienCoc || tb[2];
-            trangThaiNum = tb.trangThai !== undefined ? tb.trangThai : tb[3];
-            nguoiMuonAddr = tb.nguoiMuon || tb[4];
-          }
-
-          const tr = document.createElement("tr");
-          let statusBadge = "";
-          let actionBtn = "";
-          const depositEth = ethers.utils.formatEther(tienCocWei);
-
-          if (trangThaiNum === 0) {
-            statusBadge = `<span class="badge badge-ready">Sẵn sàng</span>`;
-            actionBtn = `<button class="btn btn-success" style="padding: 6px 12px; font-size: 0.8rem;" onclick="borrowDevice(${i}, '${depositEth}')">Mượn (${depositEth} ETH)</button>`;
-          } else if (trangThaiNum === 1) {
-            statusBadge = `<span class="badge badge-borrowed">Đang mượn</span>`;
-            actionBtn = `<span style="font-size: 0.8rem; color: var(--text-muted);">Đang sử dụng</span>`;
-          } else {
-            statusBadge = `<span class="badge badge-maintenance">Bảo trì</span>`;
-            actionBtn = `<span style="font-size: 0.8rem; color: var(--danger);">Tạm dừng</span>`;
-          }
-
-          const borrowerShort = nguoiMuonAddr === ethers.constants.AddressZero ? "--" : `${nguoiMuonAddr.substring(0, 6)}...${nguoiMuonAddr.substring(38)}`;
-
-          tr.innerHTML = `
-            <td><strong>#${i}</strong></td>
-            <td>${tenThietBi}</td>
-            <td><strong>${depositEth} ETH</strong></td>
-            <td>${statusBadge}</td>
-            <td><span style="font-family: monospace;">${borrowerShort}</span></td>
-            <td>${actionBtn}</td>
-          `;
-          tbody.appendChild(tr);
-        }
-
-        addLog(`Đã tải dữ liệu hợp đồng thành công. Tổng số thiết bị: ${total}`);
-      } catch (err) {
-        console.error(err);
-        addLog(`Lỗi tải dữ liệu: ${err.message}`);
+        const borrower = userAddress || "0x23K4300040E05...HuyenTrang";
+        addLog(`Đang gửi giao dịch ký quỹ đặt cọc ${depositEth} ETH cho thiết bị #${id} (${dev.ten})...`, "info");
+        
+        setTimeout(() => {
+          dev.trangThai = 1;
+          dev.nguoiMuon = borrower;
+          renderDeviceTable(demoDevices);
+          updateStats(demoDevices);
+          addLog(`✅ Thành công! Sinh viên (${borrower}) đã đặt cọc ${depositEth} ETH và nhận thiết bị #${id}`, "success");
+          showToast(`Chúc mừng! Đã mượn thành công thiết bị #${id}!`, "success");
+        }, 500);
+        return;
       }
-    }
 
-    async function borrowDevice(id, depositEth) {
-      if (!contract) return alert("Vui lòng kết nối ví trước!");
+      // Chế độ On-Chain Sepolia
+      if (!signer) {
+        await handleConnectWallet();
+        if (!signer) return;
+      }
+
       try {
-        addLog(`Đang gửi giao dịch đặt cọc & mượn thiết bị #${id} (${depositEth} ETH)...`);
+        addLog(`Đang gửi giao dịch mượn thiết bị #${id} kèm ${depositEth} ETH cọc lên mạng Sepolia...`, "info");
         const tx = await contract.muonThietBi(id, {
           value: ethers.utils.parseEther(depositEth)
         });
-        addLog(`Đã gửi TxHash: ${tx.hash}. Đang chờ xác thực khối...`);
+        addLog(`Đã phát TxHash: ${tx.hash}. Đang chờ xác nhận khối...`, "warn");
         await tx.wait();
-        alert("Chúc mừng! Đặt cọc và mượn thiết bị thành công!");
-        addLog(`Giao dịch hoàn tất! Đã mượn thành công thiết bị #${id}`);
+        showToast("Giao dịch Blockchain thành công! Bạn đã mượn thiết bị.", "success");
+        addLog(`Giao dịch đào khối thành công! Đã mượn thiết bị #${id}`, "success");
         loadContractData();
       } catch (err) {
-        alert("Lỗi mượn thiết bị: " + (err.data?.message || err.message));
-        addLog(`Thất bại: ${err.message}`);
+        showToast("Lỗi giao dịch: " + (err.data?.message || err.message), "error");
+        addLog("Thất bại: " + err.message, "error");
       }
     }
 
+    // NGHIỆM THU TRẢ THIẾT BỊ & HOÀN CỌC
+    async function returnAndRefund() {
+      const id = parseInt(document.getElementById("returnDeviceId").value);
+      const bps = parseInt(document.getElementById("returnDeductionBps").value || "0");
+
+      if (!id) {
+        showToast("Vui lòng nhập ID thiết bị cần nghiệm thu!", "error");
+        return;
+      }
+
+      if (isDemoMode) {
+        const dev = demoDevices.find(d => d.id === id);
+        if (!dev) return showToast(`Không tìm thấy thiết bị #${id}!`, "error");
+        if (dev.trangThai !== 1) return showToast(`Thiết bị #${id} hiện không ở trạng thái đang mượn!`, "warn");
+
+        const total = parseFloat(dev.tienCocEth);
+        const fee = (total * bps) / 10000;
+        const refund = total - fee;
+
+        dev.trangThai = 0;
+        dev.nguoiMuon = "";
+        renderDeviceTable(demoDevices);
+        updateStats(demoDevices);
+
+        addLog(`👑 Quản lý CLB nghiệm thu thiết bị #${id}: Khấu trừ phạt ${fee.toFixed(4)} ETH (${bps/100}%), Hoàn trả ${refund.toFixed(4)} ETH về ví sinh viên!`, "success");
+        showToast(`Đã hoàn cọc thành công ${refund.toFixed(4)} ETH cho sinh viên!`, "success");
+        document.getElementById("returnDeviceId").value = "";
+        return;
+      }
+
+      if (!signer) {
+        await handleConnectWallet();
+        if (!signer) return;
+      }
+
+      try {
+        addLog(`Quản trị viên đang nghiệm thu thiết bị #${id} (Khấu trừ: ${bps} bps) lên Sepolia...`, "info");
+        const tx = await contract.traVaHoanCoc(id, bps);
+        addLog(`Đã gửi TxHash: ${tx.hash}. Đang chờ đào khối...`, "warn");
+        await tx.wait();
+        showToast("Nghiệm thu và tự động hoàn cọc trên Blockchain thành công!", "success");
+        loadContractData();
+      } catch (err) {
+        showToast("Lỗi nghiệm thu: " + (err.message || err), "error");
+      }
+    }
+
+    // THÊM THIẾT BỊ MỚI
     async function addNewDevice() {
-      if (!contract) return alert("Vui lòng kết nối ví trước!");
       const name = document.getElementById("newDeviceName").value.trim();
       const depositEth = document.getElementById("newDeviceDeposit").value;
 
-      if (!name || !depositEth) return alert("Vui lòng điền đủ tên và mức cọc!");
+      if (!name || !depositEth) {
+        showToast("Vui lòng điền đủ tên và mức cọc ETH!", "error");
+        return;
+      }
+
+      if (isDemoMode) {
+        const newId = demoDevices.length + 1;
+        demoDevices.push({
+          id: newId,
+          icon: "💡",
+          ten: name,
+          loai: "Thiết bị mới bổ sung",
+          tienCocEth: parseFloat(depositEth).toFixed(3),
+          trangThai: 0,
+          nguoiMuon: ""
+        });
+        renderDeviceTable(demoDevices);
+        updateStats(demoDevices);
+        addLog(`Đã thêm thiết bị mới: "${name}" (#${newId}) với cọc ${depositEth} ETH vào kho CLB EquiTech!`, "success");
+        showToast("Thêm thiết bị mới vào kho thành công!", "success");
+        document.getElementById("newDeviceName").value = "";
+        document.getElementById("newDeviceDeposit").value = "";
+        return;
+      }
+
+      if (!signer) {
+        await handleConnectWallet();
+        if (!signer) return;
+      }
 
       try {
         const depositWei = ethers.utils.parseEther(depositEth);
-        addLog(`Quản trị viên đang thêm thiết bị "${name}" với cọc ${depositEth} ETH...`);
+        addLog(`Đang gửi giao dịch thêm thiết bị "${name}" lên Sepolia...`, "info");
         const tx = await contract.themThietBi(name, depositWei);
-        addLog(`Đã gửi TxHash: ${tx.hash}`);
+        addLog(`Đã gửi TxHash: ${tx.hash}`, "warn");
         await tx.wait();
-        alert("Đã thêm thiết bị mới thành công!");
+        showToast("Đã thêm thiết bị mới lên Blockchain thành công!", "success");
         document.getElementById("newDeviceName").value = "";
         document.getElementById("newDeviceDeposit").value = "";
         loadContractData();
       } catch (err) {
-        alert("Lỗi thêm thiết bị: " + err.message);
+        showToast("Lỗi thêm thiết bị: " + err.message, "error");
       }
     }
 
-    async function returnAndRefund() {
-      if (!contract) return alert("Vui lòng kết nối ví trước!");
-      const id = document.getElementById("returnDeviceId").value;
-      const bps = document.getElementById("returnDeductionBps").value || "0";
-
-      if (!id) return alert("Vui lòng nhập ID thiết bị!");
-
-      try {
-        addLog(`Owner đang xác nhận hoàn trả thiết bị #${id} (khấu trừ ${bps} bps)...`);
-        const tx = await contract.traVaHoanCoc(id, parseInt(bps));
-        addLog(`Đã gửi TxHash: ${tx.hash}`);
-        await tx.wait();
-        alert("Nghiệm thu thiết bị và hoàn trả tiền cọc thành công!");
-        loadContractData();
-      } catch (err) {
-        alert("Lỗi trả và hoàn cọc: " + err.message);
-      }
+    function setBps(val) {
+      document.getElementById("returnDeductionBps").value = val;
     }
+
+    function setFilter(filter, btn) {
+      currentFilter = filter;
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      renderDeviceTable(isDemoMode ? demoDevices : []);
+    }
+
+    function handleSearch() {
+      renderDeviceTable(isDemoMode ? demoDevices : []);
+    }
+
+    // TỰ ĐỘNG KHỞI CHẠY KHI MỞ TRANG
+    window.addEventListener("DOMContentLoaded", () => {
+      if (window.location.protocol === "file:") {
+        document.getElementById("fileProtocolWarning").style.display = "flex";
+      }
+      loadContractData();
+    });
   </script>
 </body>
 
