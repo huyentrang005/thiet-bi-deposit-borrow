@@ -1,7 +1,6 @@
 # SmartRent — Hệ Thống Ký Quỹ Đặt Cọc Mượn Trả Thiết Bị (ECO2432)
 
-[![Vercel Deployment](https://img.shields.io/badge/Vercel-Deployed-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://thiet-bi-deposit-borrow.vercel.app)
-[![Solidity](https://img.shields.io/badge/Solidity-0.8.20-363636?style=for-the-badge&logo=solidity&logoColor=white)](contracts/project/ProjectCore.sol)
+[![GitHub Pages](https://img.shields.io/badge/DEPLOYED-GITHUB%20PAGES-success?style=for-the-badge&logo=github&logoColor=white)](https://huyentrang005.github.io/thiet-bi-deposit-borrow/web/)[![Solidity](https://img.shields.io/badge/Solidity-0.8.20-363636?style=for-the-badge&logo=solidity&logoColor=white)](contracts/project/ProjectCore.sol)
 [![Network](https://img.shields.io/badge/Network-Sepolia%20Testnet-blue?style=for-the-badge&logo=ethereum&logoColor=white)](https://sepolia.etherscan.io/)
 [![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)](LICENSE)
 
@@ -17,9 +16,7 @@ Trang web DApp đã được cấu hình sẵn sàng triển khai trên **Vercel
 👉 **Truy cập DApp trực tiếp:** **[https://huyentrang005.github.io/thiet-bi-deposit-borrow/web/](https://huyentrang005.github.io/thiet-bi-deposit-borrow/web/)**
 > Hoặc triển khai nhanh bản sao riêng của bạn chỉ với 1 cú click:
 > 
-> [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fhuyentrang005%2Fthiet-bi-deposit-borrow)
 
----
 
 ## 📑 Mục lục
 - [1. Nhóm làm gì & Cho ai?](#1-nhóm-làm-gì--cho-ai)
