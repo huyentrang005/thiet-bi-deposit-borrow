@@ -23,8 +23,7 @@ Trang web DApp đã được cấu hình sẵn sàng triển khai trên **Vercel
 - [2. Quy tắc chính là gì?](#2-quy-tắc-chính-là-gì)
 - [3. Phân công trách nhiệm thành viên](#3-phân-công-trách-nhiệm-thành-viên)
 - [4. Cấu trúc thư mục dự án](#4-cấu-trúc-thư-mục-dự-án)
-- [5. Hướng dẫn Triển khai lên Vercel](#5-hướng-dẫn-triển-khai-lên-vercel)
-- [6. Hướng dẫn chạy thử nghiệm DApp](#6-hướng-dẫn-chạy-thử-nghiệm-dapp)
+- [5. Hướng dẫn chạy thử nghiệm DApp](#6-hướng-dẫn-chạy-thử-nghiệm-dapp)
 
 ---
 
@@ -86,26 +85,8 @@ thiet-bi-deposit-borrow/
 
 ---
 
-## 5. Hướng dẫn Triển khai lên Vercel
 
-Dự án đã có tệp cấu hình `vercel.json` trỏ sẵn thư mục `web/`:
-
-```json
-{
-  "$schema": "https://openapi.vercel.sh/vercel.json",
-  "outputDirectory": "web",
-  "buildCommand": null
-}
-```
-
-1. Đăng nhập vào **[Vercel](https://vercel.com/)** bằng tài khoản GitHub `huyentrang005`.
-2. Bấm **Add New...** ➔ Chọn **Project**.
-3. Chọn repository **`huyentrang005/thiet-bi-deposit-borrow`** ➔ Nhấn **Import**.
-4. Giữ nguyên mọi cài đặt mặc định ➔ Bấm **Deploy**. Sau ~30 giây, website sẽ hoạt động tại tên miền `*.vercel.app`.
-
----
-
-## 6. Hướng dẫn chạy thử nghiệm DApp
+## 5. Hướng dẫn chạy thử nghiệm DApp
 
 1. Mở tệp `web/index.html` trực tiếp trên trình duyệt (hoặc qua đường dẫn Vercel) có cài đặt tiện ích ví **MetaMask**.
 2. Chuyển MetaMask sang mạng **Sepolia Testnet**.
