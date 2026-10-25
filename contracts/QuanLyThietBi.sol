@@ -6,9 +6,9 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 contract QuanLyThietBi is Ownable {
     // Dinh nghia trang thai thiet bi trong kho
     enum TrangThai {
-        SanSang,     // 0: Thiet bi san sang cho muon
-        DangMuon,    // 1: Thiet bi dang duoc muon
-        BaoTri       // 2: Thiet bi dang bao tri hoac hong hoc
+        SanSang, // 0: Thiet bi san sang cho muon
+        DangMuon, // 1: Thiet bi dang duoc muon
+        BaoTri // 2: Thiet bi dang bao tri hoac hong hoc
     }
 
     // Cau truc luu tru thong tin thiet bi
@@ -34,14 +34,31 @@ contract QuanLyThietBi is Ownable {
     // Cac event ghi nhan moi thay doi trang thai tren blockchain
     event ThietBiDaThem(uint256 indexed id, string tenThietBi, uint256 tienCoc);
     event TrangThaiCapNhat(uint256 indexed id, TrangThai trangThaiMoi);
-    event ThietBiDuocMuon(uint256 indexed id, address indexed nguoiMuon, uint256 tienCoc);
+    event ThietBiDuocMuon(
+        uint256 indexed id,
+        address indexed nguoiMuon,
+        uint256 tienCoc
+    );
     event ThietBiDaTra(uint256 indexed id, address indexed nguoiMuon);
-    event TienCocDaHoan(uint256 indexed id, address indexed nguoiMuon, uint256 soTienHoan, uint256 soTienKhauTru);
+    event TienCocDaHoan(
+        uint256 indexed id,
+        address indexed nguoiMuon,
+        uint256 soTienHoan,
+        uint256 soTienKhauTru
+    );
 
-    constructor() Ownable(msg.sender) {}
+    constructor() Ownable(msg.sender) {
+        themThietBi("May Han Thiec Chinh Nhiet Quick 902D", 0.025 ether);
+        themThietBi("Bo Kit Lap Trinh AI Jetson Nano", 0.075 ether);
+        themThietBi("Micro Khong Day Rode Wireless GO II", 0.045 ether);
+        themThietBi("May In 3D Creality Ender-3 V3 SE", 0.060 ether);
+    }
 
     // Ham them thiet bi moi vao kho - chi danh cho Owner
-    function themThietBi(string calldata _tenThietBi, uint256 _tienCoc) external onlyOwner {
+    function themThietBi(
+        string calldata _tenThietBi,
+        uint256 _tienCoc
+    ) external onlyOwner {
         tongSoThietBi++;
         uint256 idMoi = tongSoThietBi;
 
@@ -74,7 +91,8 @@ contract QuanLyThietBi is Ownable {
 
         // Kiem tra dieu kien (Checks)
         if (tb.trangThai != TrangThai.SanSang) revert ThietBiKhongKhaDung(_id);
-        if (msg.value != tb.tienCoc) revert KhongDungTienCoc(msg.value, tb.tienCoc);
+        if (msg.value != tb.tienCoc)
+            revert KhongDungTienCoc(msg.value, tb.tienCoc);
 
         // Cap nhat trang thai hop dong (Effects)
         tb.trangThai = TrangThai.DangMuon;
@@ -120,14 +138,20 @@ contract QuanLyThietBi is Ownable {
     }
 
     // Ham xem chi tiet thiet bi (khong ton phi gas)
-    function layThongTinThietBi(uint256 _id) external view returns (
-        uint256 id,
-        string memory tenThietBi,
-        uint256 tienCoc,
-        TrangThai trangThai,
-        address nguoiMuon,
-        uint256 thoiDiemMuon
-    ) {
+    function layThongTinThietBi(
+        uint256 _id
+    )
+        external
+        view
+        returns (
+            uint256 id,
+            string memory tenThietBi,
+            uint256 tienCoc,
+            TrangThai trangThai,
+            address nguoiMuon,
+            uint256 thoiDiemMuon
+        )
+    {
         if (_id == 0 || _id > tongSoThietBi) revert ThietBiKhongTonTai(_id);
         ThietBi storage tb = danhSachThietBi[_id];
         return (
