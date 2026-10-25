@@ -14,8 +14,7 @@
 
 Trang web DApp đã được cấu hình sẵn sàng triển khai trên **Vercel**:
 
-👉 **Truy cập DApp trực tiếp:** **[https://thiet-bi-deposit-borrow.vercel.app](https://thiet-bi-deposit-borrow.vercel.app)**
-
+👉 **Truy cập DApp trực tiếp:** **[https://huyentrang005.github.io/thiet-bi-deposit-borrow/web/](https://huyentrang005.github.io/thiet-bi-deposit-borrow/web/)**
 > Hoặc triển khai nhanh bản sao riêng của bạn chỉ với 1 cú click:
 > 
 > [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fhuyentrang005%2Fthiet-bi-deposit-borrow)
