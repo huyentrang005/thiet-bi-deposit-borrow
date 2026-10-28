@@ -11,7 +11,7 @@
 
 ## 🌐 Trải nghiệm Trực tiếp (Live Demo)
 
-Trang web DApp đã được cấu hình sẵn sàng triển khai trên **Vercel**:
+Trang web DApp đã được cấu hình sẵn sàng:
 
 👉 **Truy cập DApp trực tiếp:** **[https://huyentrang005.github.io/thiet-bi-deposit-borrow/web/](https://huyentrang005.github.io/thiet-bi-deposit-borrow/web/)**
 > Hoặc triển khai nhanh bản sao riêng của bạn chỉ với 1 cú click:
