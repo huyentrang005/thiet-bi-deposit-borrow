@@ -3,7 +3,7 @@
 **Tên dự án:** Hệ thống Quản lý Đặt cọc & Mượn trả Thiết bị CLB (SmartRent)  
 **Mã lớp / Học phần:** ECO2432 — Tiền điện tử & Công nghệ Blockchain  
 **Repo nhóm:** `https://github.com/huyentrang005/thiet-bi-deposit-borrow`  
-**Địa chỉ DApp trực tuyến:** [https://thiet-bi-deposit-borrow.vercel.app](https://thiet-bi-deposit-borrow.vercel.app)  
+**Địa chỉ DApp trực tuyến:** [https://huyentrang005.github.io/thiet-bi-deposit-borrow/web/](https://huyentrang005.github.io/thiet-bi-deposit-borrow/web/)  
 **Phiên bản phát hành:** Tag Git `v1.0.0` (Production Ready)
 
 **Thành viên thực hiện:**
@@ -20,7 +20,7 @@
 | **Hợp đồng QuanLyThietBi** | `0xC61d78A92B7Dfdf85fAB1c22135977721dd96F4c` |
 | **Hợp đồng ProjectCore** | `0x47666Fab8bd0Ac7003bce3f5C3585383F09486E2` |
 | **Trình duyệt khối (Blockscout/Etherscan)** | [Xem Contract trên Sepolia](https://sepolia.etherscan.io/address/0xC61d78A92B7Dfdf85fAB1c22135977721dd96F4c) |
-| **Dền tảng Hosting DApp** | Vercel Serverless Static Platform (`vercel.json`) |
+| **Nền tảng Hosting DApp** | GitHub Pages (`https://huyentrang005.github.io/thiet-bi-deposit-borrow/`) |
 | **Thư viện Web3** | Ethers.js v5.7.2 CDN + Vanilla Modern CSS/JS |
 
 ---

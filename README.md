@@ -11,12 +11,10 @@
 
 ## 🌐 Trải nghiệm Trực tiếp (Live Demo)
 
-Trang web DApp đã được cấu hình sẵn sàng:
+Trang web DApp đã được phát hành chính thức qua **GitHub Pages**:
 
-👉 **Truy cập DApp trực tiếp:** **[https://huyentrang005.github.io/thiet-bi-deposit-borrow/web/](https://huyentrang005.github.io/thiet-bi-deposit-borrow/web/)**
-> Hoặc triển khai nhanh bản sao riêng của bạn chỉ với 1 cú click:
-> 
-
+👉 **Truy cập DApp trực tiếp:** **[https://huyentrang005.github.io/thiet-bi-deposit-borrow/web/](https://huyentrang005.github.io/thiet-bi-deposit-borrow/web/)**  
+*(Hoặc link ngắn: [https://huyentrang005.github.io/thiet-bi-deposit-borrow/](https://huyentrang005.github.io/thiet-bi-deposit-borrow/))*
 
 ## 📑 Mục lục
 - [1. Nhóm làm gì & Cho ai?](#1-nhóm-làm-gì--cho-ai)
@@ -88,7 +86,7 @@ thiet-bi-deposit-borrow/
 
 ## 5. Hướng dẫn chạy thử nghiệm DApp
 
-1. Mở tệp `web/index.html` trực tiếp trên trình duyệt (hoặc qua đường dẫn Vercel) có cài đặt tiện ích ví **MetaMask**.
+1. Mở trang web bằng đường dẫn GitHub Pages trên trình duyệt có cài đặt tiện ích ví **MetaMask**.
 2. Chuyển MetaMask sang mạng **Sepolia Testnet**.
 3. Bấm **Kết nối ví MetaMask**.
 4. Nhập địa chỉ hợp đồng đã deploy và bấm **Tải dữ liệu**.
