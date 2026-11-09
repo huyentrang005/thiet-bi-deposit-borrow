@@ -788,6 +788,9 @@
           <span id="modeBadge" class="badge" style="background: rgba(99, 102, 241, 0.2); color: #a5b4fc;">
             Đang tải dữ liệu...
           </span>
+          <button class="btn btn-secondary btn-sm" onclick="resetToDefaultDevices()" title="Khôi phục lại dữ liệu mẫu gốc">
+            🔄 Đặt Lại Gốc
+          </button>
         </div>
       </div>
 
@@ -923,13 +926,47 @@
     let pendingBorrowDeposit = null;
 
     // Danh sách thiết bị mẫu chất lượng cao cho CLB EquiTech
-    let demoDevices = [
+    const DEFAULT_DEMO_DEVICES = [
       { id: 1, icon: "📷", ten: "Máy ảnh kỹ thuật số Canon EOS R50 (Kèm Lens Kit)", loai: "Thiết bị quay chụp", tienCocEth: "0.050", trangThai: 0, nguoiMuon: "" },
       { id: 2, icon: "🎛️", ten: "Bộ Kit Vi Điều Khiển STM32 & Cảm Biến IoT SmartHome", loai: "Bộ Kit thực hành", tienCocEth: "0.020", trangThai: 0, nguoiMuon: "" },
       { id: 3, icon: "📽️", ten: "Máy Chiếu Di Động Full HD Epson CO-FH02 (3000 Ansi)", loai: "Thiết bị hội thảo", tienCocEth: "0.080", trangThai: 1, nguoiMuon: "0x71C84920E3253b76E1A8dCd12A456C6977113A9F" },
       { id: 4, icon: "📟", ten: "Máy Đo Tín Hiệu Xung Cầm Tay Oscilloscope DS212 Mini", loai: "Thiết bị đo lường", tienCocEth: "0.040", trangThai: 0, nguoiMuon: "" },
       { id: 5, icon: "🥽", ten: "Kính Thực Tế Ảo VR Meta Quest 2 128GB", loai: "Thiết bị trải nghiệm AR/VR", tienCocEth: "0.100", trangThai: 0, nguoiMuon: "" }
     ];
+
+    function getStoredDemoDevices() {
+      try {
+        const saved = localStorage.getItem("smartrent_devices");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        }
+      } catch (e) {
+        console.warn("Lỗi đọc localStorage:", e);
+      }
+      return JSON.parse(JSON.stringify(DEFAULT_DEMO_DEVICES));
+    }
+
+    function saveDemoDevices(devices) {
+      try {
+        localStorage.setItem("smartrent_devices", JSON.stringify(devices));
+      } catch (e) {
+        console.warn("Lỗi ghi localStorage:", e);
+      }
+    }
+
+    function resetToDefaultDevices() {
+      if (confirm("Bạn có chắc chắn muốn đặt lại danh sách thiết bị về mặc định ban đầu không?")) {
+        localStorage.removeItem("smartrent_devices");
+        demoDevices = JSON.parse(JSON.stringify(DEFAULT_DEMO_DEVICES));
+        renderDeviceTable(demoDevices);
+        updateStats(demoDevices);
+        showToast("Đã khôi phục dữ liệu thiết bị ban đầu thành công!", "success");
+        addLog("Đã khôi phục dữ liệu ban đầu của kho thiết bị CLB.", "info");
+      }
+    }
+
+    let demoDevices = getStoredDemoDevices();
 
     // HIỂN THỊ THÔNG BÁO TOAST
     function showToast(msg, type = "info") {
@@ -1198,6 +1235,7 @@
 
       // Chế độ Demo Interactive
       isDemoMode = true;
+      demoDevices = getStoredDemoDevices();
       modeBadge.innerText = "🟡 Demo Tương Tác (CLB EquiTech)";
       modeBadge.className = "badge badge-borrowed";
       renderDeviceTable(demoDevices);
@@ -1249,7 +1287,7 @@
           actionBtn = `<button class="btn btn-success btn-sm" onclick="openBorrowModal(${item.id}, '${item.ten.replace(/'/g, "\\'")}', '${item.tienCocEth}')">Mượn (${item.tienCocEth} ETH)</button>`;
         } else if (item.trangThai === 1) {
           statusBadge = `<span class="badge badge-borrowed">● Đang mượn</span>`;
-          actionBtn = `<span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 500;">🔒 Đang sử dụng</span>`;
+          actionBtn = `<button class="btn btn-warning btn-sm" onclick="quickReturn(${item.id})">💸 Trả & Hoàn Cọc</button>`;
         } else {
           statusBadge = `<span class="badge badge-maintenance">● Bảo trì</span>`;
           actionBtn = `<span style="font-size: 0.8rem; color: var(--danger);">Tạm dừng</span>`;
@@ -1313,6 +1351,7 @@
         setTimeout(() => {
           dev.trangThai = 1;
           dev.nguoiMuon = borrower;
+          saveDemoDevices(demoDevices);
           renderDeviceTable(demoDevices);
           updateStats(demoDevices);
           addLog(`✅ Thành công! Sinh viên (${borrower}) đã đặt cọc ${depositEth} ETH và nhận thiết bị #${id}`, "success");
@@ -1343,6 +1382,17 @@
       }
     }
 
+    // TRẢ THIẾT BỊ NHANH TỪ BẢNG
+    function quickReturn(id) {
+      const dev = (isDemoMode ? demoDevices : []).find(d => d.id === id);
+      const name = dev ? dev.ten : `#${id}`;
+      const deduction = prompt(`Xác nhận nghiệm thu trả thiết bị #${id}: "${name}"\n\nNhập tỷ lệ khấu trừ phạt trễ hạn / hư hại (Basis Point, 0 = Hoàn 100%, 500 = Trừ 5%):`, "0");
+      if (deduction === null) return;
+      document.getElementById("returnDeviceId").value = id;
+      document.getElementById("returnDeductionBps").value = parseInt(deduction) || 0;
+      returnAndRefund();
+    }
+
     // NGHIỆM THU TRẢ THIẾT BỊ & HOÀN CỌC
     async function returnAndRefund() {
       const id = parseInt(document.getElementById("returnDeviceId").value);
@@ -1364,6 +1414,7 @@
 
         dev.trangThai = 0;
         dev.nguoiMuon = "";
+        saveDemoDevices(demoDevices);
         renderDeviceTable(demoDevices);
         updateStats(demoDevices);
 
@@ -1401,7 +1452,7 @@
       }
 
       if (isDemoMode) {
-        const newId = demoDevices.length + 1;
+        const newId = demoDevices.length > 0 ? Math.max(...demoDevices.map(d => d.id)) + 1 : 1;
         demoDevices.push({
           id: newId,
           icon: "💡",
@@ -1411,6 +1462,7 @@
           trangThai: 0,
           nguoiMuon: ""
         });
+        saveDemoDevices(demoDevices);
         renderDeviceTable(demoDevices);
         updateStats(demoDevices);
         addLog(`Đã thêm thiết bị mới: "${name}" (#${newId}) với cọc ${depositEth} ETH vào kho CLB EquiTech!`, "success");
